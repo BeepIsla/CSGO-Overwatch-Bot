@@ -118,6 +118,10 @@ csgoUser.on("debug", (event) => {
 									// Check pitch
 									if (typeof lastFewAngles[i] !== "undefined" && typeof lastFewAngles[i + 1] !== "undefined") {
 										if (!almostEqual(lastFewAngles[i].pitch, lastFewAngles[i + 1].pitch, config.parsing.threshold)) {
+											if (is360Difference(lastFewAngles[i].pitch, lastFewAngles[i + 1].pitch)) {
+												continue;
+											}
+
 											aimbot_infractions.push({ prevAngle: lastFewAngles[i], nextAngle: lastFewAngles[i + 1], tick: demoFile.currentTick });
 										}
 									}
@@ -125,6 +129,10 @@ csgoUser.on("debug", (event) => {
 									// Check yaw
 									if (typeof lastFewAngles[i] !== "undefined" && typeof lastFewAngles[i + 1] !== "undefined") {
 										if (!almostEqual(lastFewAngles[i].yaw, lastFewAngles[i + 1].yaw, config.parsing.threshold)) {
+											if (is360Difference(lastFewAngles[i].yaw, lastFewAngles[i + 1].yaw)) {
+												continue;
+											}
+
 											aimbot_infractions.push({ prevAngle: lastFewAngles[i], nextAngle: lastFewAngles[i + 1], tick: demoFile.currentTick });
 										}
 									}
@@ -159,23 +167,36 @@ csgoUser.on("debug", (event) => {
 				});
 			});
 		} else {
-			if (msg.verdict === 2) { // We are done here!
-				console.log("Successfully submitted verdict for case " + msg.caseid + " throttled for " + msg.throttleseconds + " seconds");
+			console.log("Successfully submitted verdict for case " + msg.caseid + " throttled for " + msg.throttleseconds + " seconds");
 
-				// Request a overwatch case after the time has run out
-				setTimeout(() => {
-					console.log("-----------------\nRequested Overwatch case");
-					csgoUser._GC.send({
-						msg: csgoUser.Protos.ECsgoGCMsg.k_EMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate,
-						proto: {}
-					}, new csgoUser.Protos.CMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate({
-						reason: 1
-					}).toBuffer());
-				},  ((msg.throttleseconds + 1) * 1000));
-			}
+			// Request a overwatch case after the time has run out
+			setTimeout(() => {
+				console.log("-----------------\nRequested Overwatch case");
+				csgoUser._GC.send({
+					msg: csgoUser.Protos.ECsgoGCMsg.k_EMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate,
+					proto: {}
+				}, new csgoUser.Protos.CMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate({
+					reason: 1
+				}).toBuffer());
+			},  ((msg.throttleseconds + 1) * 1000));
 		}
 		return;
 	}
 
 	console.log(event); // Unhandled event
 });
+
+// Shitty check for 360 changes. Majority of infractions slip through here
+function is360Difference(angle1, angle2) {
+	// Check 0-360
+	if (angle1 <= 10.0 && angle1 >= 0.0 && angle2 <= 360.0 && angle2 >= 350.0) {
+		return true;
+	} 
+
+	// Check 360-0
+	if (angle1 <= 360.0 && angle1 >= 350.0 && angle2 <= 10.0 && angle2 >= 0.0) {
+		return true;
+	}
+
+	return false;
+}
