@@ -1,0 +1,14 @@
+{
+	"account": {
+		"username": "ExampleUsername",
+		"password": "ExamplePassword",
+		"sharedSecret": ""
+	},
+	"parsing": {
+		"maxTicks": 10,
+		"threshold": 1.0
+	},
+	"verdict": {
+		"maxAimbot": 20
+	}
+}
