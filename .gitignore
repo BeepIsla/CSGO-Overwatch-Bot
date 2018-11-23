@@ -1,0 +1,5 @@
+node_modules
+.vscode
+config.json
+GC2ClientHelloResponse*.json
+demofile.dem
