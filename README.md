@@ -8,8 +8,6 @@ When running this you will get some unhandled cases which we simply don't care a
 
 Log the past X ticks, when the suspect gets a kill check all angles within the past X ticks. If the difference is above the threshold add an infraction.
 
-**This does NOT account for changes from -179 to 179 or similar and will count as an infraction**
-
 # Config
 
 - `account`
@@ -75,7 +73,7 @@ How Overwatch data is exchanged between GC and Client. The data shown below has 
    - `caseid` (Ex: `331349...`)
    - - Our case identifier
    - `verdict` (Ex: `2`)
-   - - I assume this tells our client to remove the Overwatch button from the menu and that we are done with the current case
+   - - Unknown (Previous information was false, I just got one with `1` instead of `2`)
    - `throttleseconds` (Ex: `7`)
    - - I assume this tells our client to wait this many seconds before we are allowed a new case
 8. *Repeat*
