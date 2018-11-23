@@ -28,16 +28,6 @@ steamUser.once("loggedOn", () => {
 	steamUser.setPersona(SteamUser.Steam.EPersonaState.Online);
 	steamUser.gamesPlayed([ 730 ]);
 	csgoUser.start();
-
-	setTimeout(() => {
-		console.log("-----------------\nRequested Overwatch case");
-		csgoUser._GC.send({
-			msg: csgoUser.Protos.ECsgoGCMsg.k_EMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate,
-			proto: {}
-		}, new csgoUser.Protos.CMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate({
-			reason: 1
-		}).toBuffer());
-	},  (4 * 1000));
 });
 
 steamUser.on("error", (err) => {
@@ -47,15 +37,18 @@ steamUser.on("error", (err) => {
 });
 
 csgoUser.on("debug", (event) => {
-	if (event.header.msg === csgoUser.Protos.ECsgoGCMsg.k_EMsgGCCStrike15_v2_MatchmakingGC2ClientHello) {
-		var msg = csgoUser.Protos.CMsgGCCStrike15_v2_MatchmakingGC2ClientHello.decode(event.buffer);
-		console.log(msg);
-		return;
-	}
-
 	if (event.header.msg === csgoUser.Protos.EGCBaseClientMsg.k_EMsgGCClientWelcome) {
+		/* The content is irrelevant
 		var msg = csgoUser.Protos.CMsgClientWelcome.decode(event.buffer);
-		console.log(msg);
+		console.log(msg);*/
+
+		console.log("-----------------\nRequested Overwatch case");
+		csgoUser._GC.send({
+			msg: csgoUser.Protos.ECsgoGCMsg.k_EMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate,
+			proto: {}
+		}, new csgoUser.Protos.CMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate({
+			reason: 1
+		}).toBuffer());
 		return;
 	}
 
