@@ -32,6 +32,7 @@ var data = {
 	},
 	curcasetempdata: {
 		sid: undefined,
+		owMsg: undefined,
 		aimbot_infractions: []
 	}
 };
@@ -82,6 +83,7 @@ csgoUser.on("debug", (event) => {
 		console.log(msg);
 
 		if (msg.caseurl) {
+			data.curcasetempdata.owMsg = msg;
 			data.download.startTimestamp = new Date().getTime();
 
 			// Download demo
@@ -208,7 +210,7 @@ csgoUser.on("debug", (event) => {
 		} else {
 			if (!msg.caseid) {
 				// We are still on cooldown
-				console.log("We are still on cooldown... Waiting " + (msg.throttleseconds + 1) + "seconds");
+				console.log("We are still on cooldown... Waiting " + (msg.throttleseconds + 1) + " seconds");
 
 				setTimeout(() => {
 					data.total.startTimestamp = new Date().getTime();
@@ -241,6 +243,17 @@ csgoUser.on("debug", (event) => {
 			console.log("	Unpacking: " + parseInt((data.unpacking.endTimestamp - data.unpacking.startTimestamp) / 1000) + "s");
 			console.log("	Parsing: " + parseInt((data.parsing.endTimestamp - data.parsing.startTimestamp) / 1000) + "s");
 			console.log("	Throttle: " + msg.throttleseconds + "s");
+
+			if (config.verdict.writeLog) {
+				if (!fs.existsSync("./cases")) {
+					fs.mkdirSync("./cases");
+				}
+
+				// Write case file
+				fs.mkdirSync("./cases/" + msg.caseid);
+				fs.writeFileSync("./cases/" + msg.caseid + "/message.json", JSON.stringify(data.curcasetempdata.owMsg, null, 4));
+				fs.writeFileSync("./cases/" + msg.caseid + "/data.json", JSON.stringify(data, null, 4));
+			}
 
 			// Check case limit
 			if (config.verdict.maxVerdicts > 0 && data.casesCompleted >= config.verdict.maxVerdicts) {
