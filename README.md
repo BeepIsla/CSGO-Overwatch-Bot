@@ -17,6 +17,7 @@ Log the past X ticks, when the suspect gets a kill check all angles within the p
 - - `maxTicks`: The maximum amount of ticks to check when the suspect gets a kill
 - - `threshold`: The maximum threshold between angles before adding an infraction
 - `verdict`
+- - `maxVerdicts`: The maximum amount of cases we want to do. 0 for infinite
 - - `maxAimbot`: The maximum amount of infractions allowed before setting user as aimbotter
 
 # GameCoordinator
