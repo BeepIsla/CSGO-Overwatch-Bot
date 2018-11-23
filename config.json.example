@@ -9,6 +9,7 @@
 		"threshold": 1.0
 	},
 	"verdict": {
+		"maxVerdicts": 0,
 		"maxAimbot": 20
 	}
 }
