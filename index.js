@@ -61,7 +61,7 @@ csgoUser.on("debug", (event) => {
 			if (fs.existsSync("./demofile.dem")) fs.unlinkSync("./demofile.dem");
 			console.log("Downloading case " + msg.caseid + " from url " + msg.caseurl);
 
-			var sid = new SteamID("[U:1:" + msg.suspectid + "]");
+			var sid = SteamID.fromIndividualAccountID(msg.suspectid);
 			if (!sid.isValid()) {
 				console.log("Got invalid suspect ID " + msg.suspectid);
 				return;
@@ -85,7 +85,7 @@ csgoUser.on("debug", (event) => {
 					fs.createReadStream("./demofile.bz2").pipe(bz2()).pipe(fs.createWriteStream("./demofile.dem")).on("close", () => {
 						fs.unlinkSync("./demofile.bz2");
 
-						console.log("Finished unpacking " + msg.caseid + "Parsing as suspect " + sid.getSteamID64() + "...");
+						console.log("Finished unpacking " + msg.caseid + ", parsing as suspect " + sid.getSteamID64() + "...");
 
 						// WARNING: Really shitty aimbot detection ahead!
 						fs.readFile("./demofile.dem", (err, buffer) => {
