@@ -22,12 +22,18 @@ module.exports = class GameCoordinator extends Events {
 	};
 
 	start() {
+		// Send once instantly and then with a 10 second delay to avoid starting the entire process twice or more when having a bad connection
+		this._GC.send({
+			msg: Protos.EGCBaseClientMsg.k_EMsgGCClientHello,
+			proto: {}
+		}, new Protos.CMsgClientHello({}).toBuffer());
+
 		this._GCHelloInterval = setInterval(() => {
 			// Client Hello
 			this._GC.send({
 				msg: Protos.EGCBaseClientMsg.k_EMsgGCClientHello,
 				proto: {}
 			}, new Protos.CMsgClientHello({}).toBuffer());
-		}, (2 * 1000));
+		}, (10 * 1000));
 	};
 }
