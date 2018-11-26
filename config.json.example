@@ -6,6 +6,7 @@
 	},
 	"parsing": {
 		"steamWebAPIKey": "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+		"minimumTime": 240,
 		"maxTicks": 10,
 		"threshold": 1.0
 	},
@@ -13,5 +14,8 @@
 		"writeLog": true,
 		"maxVerdicts": 0,
 		"maxAimbot": 20
+	},
+	"other": {
+		"autoDecode": false
 	}
 }
