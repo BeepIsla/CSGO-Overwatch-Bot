@@ -150,7 +150,9 @@ csgoUser.on("debug", (event) => {
 
 							demoFile.gameEvents.on("player_death", (event) => {
 								var attacker = demoFile.entities.getByUserId(event.attacker);
-								if (!attacker) return; // Attacker no longer available
+								if (!attacker || attacker.steamId === "BOT" || new SteamID(attacker.steamId).getSteamID64() !== sid.getSteamID64()) {
+									return; // Attacker no longer available or not our attacker
+								}
 
 								for (let i = 0; i < lastFewAngles.length; i++) {
 									// Check pitch
@@ -279,15 +281,15 @@ csgoUser.on("debug", (event) => {
 	console.log(event); // Unhandled event
 });
 
-// Shitty check for 360 changes. Majority of infractions slip through here
+// Shitty check for 360 changes
 function is360Difference(angle1, angle2) {
-	// Check 0-360
-	if (angle1 <= 10.0 && angle1 >= 0.0 && angle2 <= 360.0 && angle2 >= 350.0) {
+	// Check 0 < 360
+	if (angle1 <= config.threshold && angle1 >= 0.0 && angle2 <= 360.0 && angle2 >= (360.0 - config.threshold)) {
 		return true;
 	}
 
-	// Check 360-0
-	if (angle1 <= 360.0 && angle1 >= 350.0 && angle2 <= 10.0 && angle2 >= 0.0) {
+	// Check 360 > 0
+	if (angle1 <= 360.0 && angle1 >= (360.0 - config.threshold) && angle2 <= config.threshold && angle2 >= 0.0) {
 		return true;
 	}
 
