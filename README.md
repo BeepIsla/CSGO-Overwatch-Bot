@@ -13,7 +13,9 @@ Log the past X ticks, when the suspect gets a kill check all angles within the p
 - `account`
 - - `username`: The account name you use to log into that account
 - - `password`: The password for the account
+- - `sharedSecret`: Optional shared secret for two factor authentication
 - `parsing`
+- - `steamWebAPIKey`: Optional Steam Web API key
 - - `maxTicks`: The maximum amount of ticks to check when the suspect gets a kill
 - - `threshold`: The maximum threshold between angles before adding an infraction
 - `verdict`
@@ -80,4 +82,4 @@ How Overwatch data is exchanged between GC and Client. The data shown below has 
    - - I assume this tells our client to wait this many seconds before we are allowed a new case
 8. *Repeat*
 
-If we start the game with a Overwatch case already being assigned to us the game sends `CMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate` with `reason` being `0`. The GC wil respond with the same assigned case we got earlier. It might also respond with a new case incase our old case has expired, this is untested though.
+If we start the game with a Overwatch case already being assigned to us the GC wil respond with the same assigned case we got earlier. It might also respond with a new case incase our old case has expired, this is untested though.

@@ -5,6 +5,7 @@
 		"sharedSecret": ""
 	},
 	"parsing": {
+		"steamWebAPIKey": "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
 		"maxTicks": 10,
 		"threshold": 1.0
 	},
