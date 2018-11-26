@@ -7,10 +7,12 @@ const bz2 = require("unbzip2-stream");
 const SteamID = require("steamid");
 const almostEqual = require("almost-equal");
 const GameCoordinator = require("./GameCoordinator.js");
+const Decoder = require("./ProtobufDecoder.js");
 const config = require("./config.json");
 
 const steamUser = new SteamUser();
 const csgoUser = new GameCoordinator(steamUser);
+const decoder = new Decoder(csgoUser);
 
 var data = {
 	casesCompleted: 0,
@@ -63,10 +65,6 @@ steamUser.on("error", (err) => {
 
 csgoUser.on("debug", (event) => {
 	if (event.header.msg === csgoUser.Protos.EGCBaseClientMsg.k_EMsgGCClientWelcome) {
-		/* The content is irrelevant
-		var msg = csgoUser.Protos.CMsgClientWelcome.decode(event.buffer);
-		console.log(msg);*/
-
 		data.total.startTimestamp = new Date().getTime();
 		console.log("-----------------\nRequested Overwatch case");
 		csgoUser._GC.send({
@@ -80,7 +78,6 @@ csgoUser.on("debug", (event) => {
 
 	if (event.header.msg === csgoUser.Protos.ECsgoGCMsg.k_EMsgGCCStrike15_v2_PlayerOverwatchCaseAssignment) {
 		var msg = csgoUser.Protos.CMsgGCCStrike15_v2_PlayerOverwatchCaseAssignment.decode(event.buffer);
-		console.log(msg);
 
 		if (msg.caseurl) {
 			data.curcasetempdata.owMsg = msg;
@@ -242,6 +239,15 @@ csgoUser.on("debug", (event) => {
 									}
 								}
 
+								if ((data.parsing.endTimestamp - data.parsing.startTimestamp) < (config.parsing.minimumTime * 1000)) {
+									// Wait this long before sending the request, if we parse the demo too fast the GC ignores us
+									var timer = parseInt((config.parsing.minimumTime * 1000) - (data.parsing.endTimestamp - data.parsing.startTimestamp)) / 1000;
+
+									console.log("Waiting " + parseInt(timer) + " second" + (parseInt(timer) === 1 ? "" : "s") + " to avoid the GC ignoring us");
+
+									await new Promise(r => setTimeout(r, (timer * 1000)));
+								}
+
 								// Once we finished analysing the demo send the results
 								csgoUser._GC.send({
 									msg: csgoUser.Protos.ECsgoGCMsg.k_EMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate,
@@ -321,7 +327,16 @@ csgoUser.on("debug", (event) => {
 		return;
 	}
 
-	console.log(event); // Unhandled event
+	// Decode all unhandled protobufs if desired
+	if (config.other.autoDecode) {
+		// Will return a object with:
+		// "header", which is the raw default header
+		// "matchingHeaders", which an array of all the headers which matched this specific ID
+		// "decoded", which is an array of all protobufs applied to the buffer to try and decode it, the ones which failed are not included
+		console.log(decoder.decode(event));
+	} else {
+		console.log(event);
+	}
 });
 
 // Shitty check for 360 changes

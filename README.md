@@ -16,12 +16,15 @@ Log the past X ticks, when the suspect gets a kill check all angles within the p
 - - `sharedSecret`: Optional shared secret for two factor authentication
 - `parsing`
 - - `steamWebAPIKey`: Optional Steam Web API key
+- - `minimumTime`: The minimum amount of seconds of parsing before sending the Conviction-Message
 - - `maxTicks`: The maximum amount of ticks to check when the suspect gets a kill
 - - `threshold`: The maximum threshold between angles before adding an infraction
 - `verdict`
 - - `writeLog`: Should we write logs to a file?
 - - `maxVerdicts`: The maximum amount of cases we want to do. 0 for infinite
 - - `maxAimbot`: The maximum amount of infractions allowed before setting user as aimbotter
+- `other`
+- - `autoDecode`: Automatically try to decode an incoming unhandled message
 
 # GameCoordinator
 
