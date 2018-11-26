@@ -190,11 +190,8 @@ csgoUser.on("debug", (event) => {
 
 								console.log("Done parsing case " + msg.caseid);
 
-								// Once we finished analysing the demo send the results
-								csgoUser._GC.send({
-									msg: csgoUser.Protos.ECsgoGCMsg.k_EMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate,
-									proto: {}
-								}, new csgoUser.Protos.CMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate({
+								// Setup conviction object
+								var convictionObj = {
 									caseid: msg.caseid,
 									suspectid: msg.suspectid,
 									fractionid: msg.fractionid,
@@ -203,7 +200,53 @@ csgoUser.on("debug", (event) => {
 									rpt_speedhack: 0, // TODO: Add detection for other cheats (Ex BunnyHopping)
 									rpt_teamharm: 0, // TODO: Add detection of griefing (Ex Afking, Damaging teammates)
 									reason: 3
-								}).toBuffer());
+								};
+
+								// Check the Steam Web API, if a token is provided, if the user is already banned, if so always send a conviction even if the bot didn't detect it
+								if (config.parsing.steamWebAPIKey && config.parsing.steamWebAPIKey.length >= 10) {
+									var banChecker = await new Promise((resolve, reject) => {
+										request("https://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=" + config.parsing.steamWebAPIKey + "&format=json&steamids=" + sid.getSteamID64(), (err, res, body) => {
+											if (err) {
+												reject(err);
+												return;
+											}
+
+											var json = undefined;
+											try {
+												json = JSON.parse(body);
+											} catch(e) {};
+
+											if (json === undefined) {
+												reject(body);
+												return;
+											}
+
+											if (!json.players || json.players.length <= 0) {
+												reject(json);
+												return;
+											}
+
+											resolve(json.players[0]);
+										});
+									}).catch((err) => {
+										console.error(err);
+									});
+
+									if (banChecker && banChecker.NumberOfGameBans >= 1 && banChecker.DaysSinceLastBan <= 7 /* Demos are availble for 1 week */) {
+										// If the bot didn't catch the suspect aimbotting it is most likely just a waller and nothing else
+										convictionObj.rpt_wallhack = 1;
+
+										console.log("Suspect is already banned. Forcefully convicting...");
+									} else {
+										console.log("Suspect has not been banned yet according to the Steam API");
+									}
+								}
+
+								// Once we finished analysing the demo send the results
+								csgoUser._GC.send({
+									msg: csgoUser.Protos.ECsgoGCMsg.k_EMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate,
+									proto: {}
+								}, new csgoUser.Protos.CMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate(convictionObj).toBuffer());
 							});
 						});
 					});
