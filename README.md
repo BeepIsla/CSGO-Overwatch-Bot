@@ -4,9 +4,12 @@ Automatically solves Overwatch cases. Although **the detection algorithm for Aim
 
 When running this you will get some unhandled cases which we simply don't care about.
 
-# Aimbot detection
+# Detections
 
-Log the past X ticks, when the suspect gets a kill check all angles within the past X ticks. If the difference is above the threshold add an infraction.
+- **Aimbot**:
+- - Log the past X ticks, when the suspect gets a kill check all angles within the past X ticks. If the difference is above the threshold add an infraction.
+- **AFKing**:
+- - Everytime the round starts log the current position of the player on every tick, at the end of the round compare all the positions. If the player did not leave a specific radius within the entire round add an infraction.
 
 # Config
 
