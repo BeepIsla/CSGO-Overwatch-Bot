@@ -5,7 +5,10 @@ const request = require("request");
 const demofile = require("demofile");
 const bz2 = require("unbzip2-stream");
 const SteamID = require("steamid");
-const almostEqual = require("almost-equal");
+
+const Aimbot = require("./detectors/aimbot.js");
+const AFKing = require("./detectors/AFKing.js");
+
 const GameCoordinator = require("./GameCoordinator.js");
 const Decoder = require("./ProtobufDecoder.js");
 const config = require("./config.json");
@@ -35,7 +38,8 @@ var data = {
 	curcasetempdata: {
 		sid: undefined,
 		owMsg: undefined,
-		aimbot_infractions: []
+		aimbot_infractions: [],
+		AFKing_infractions: []
 	}
 };
 
@@ -66,7 +70,7 @@ steamUser.on("error", (err) => {
 csgoUser.on("debug", (event) => {
 	if (event.header.msg === csgoUser.Protos.EGCBaseClientMsg.k_EMsgGCClientWelcome) {
 		data.total.startTimestamp = new Date().getTime();
-		console.log("-----------------\nRequested Overwatch case");
+		console.log("-".repeat(20) + "\nRequested Overwatch case");
 		csgoUser._GC.send({
 			msg: csgoUser.Protos.ECsgoGCMsg.k_EMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate,
 			proto: {}
@@ -122,7 +126,6 @@ csgoUser.on("debug", (event) => {
 
 						console.log("Finished unpacking " + msg.caseid + ", parsing as suspect " + sid.getSteamID64() + "...");
 
-						// WARNING: Really shitty aimbot detection ahead!
 						fs.readFile("./demofile.dem", (err, buffer) => {
 							if (err) return console.error(err);
 
@@ -130,51 +133,9 @@ csgoUser.on("debug", (event) => {
 
 							const demoFile = new demofile.DemoFile();
 
-							// Detect Aimbot
-							var lastFewAngles = [];
-							demoFile.on("tickend", (curTick) => {
-								var ourPlayer = demoFile.players.filter(p => p.steamId !== "BOT" && new SteamID(p.steamId).getSteamID64() === sid.getSteamID64());
-								if (ourPlayer.length <= 0) { // User left
-									lastFewAngles = [];
-									return;
-								}
-								lastFewAngles.push(ourPlayer[0].eyeAngles);
-
-								if (lastFewAngles.length >= config.parsing.maxTicks) {
-									lastFewAngles.shift();
-								}
-							});
-
-							demoFile.gameEvents.on("player_death", (event) => {
-								var attacker = demoFile.entities.getByUserId(event.attacker);
-								if (!attacker || attacker.steamId === "BOT" || new SteamID(attacker.steamId).getSteamID64() !== sid.getSteamID64()) {
-									return; // Attacker no longer available or not our attacker
-								}
-
-								for (let i = 0; i < lastFewAngles.length; i++) {
-									// Check pitch
-									if (typeof lastFewAngles[i] !== "undefined" && typeof lastFewAngles[i + 1] !== "undefined") {
-										if (!almostEqual(lastFewAngles[i].pitch, lastFewAngles[i + 1].pitch, config.parsing.threshold)) {
-											if (is360Difference(lastFewAngles[i].pitch, lastFewAngles[i + 1].pitch)) {
-												continue;
-											}
-
-											data.curcasetempdata.aimbot_infractions.push({ prevAngle: lastFewAngles[i], nextAngle: lastFewAngles[i + 1], tick: demoFile.currentTick });
-										}
-									}
-
-									// Check yaw
-									if (typeof lastFewAngles[i] !== "undefined" && typeof lastFewAngles[i + 1] !== "undefined") {
-										if (!almostEqual(lastFewAngles[i].yaw, lastFewAngles[i + 1].yaw, config.parsing.threshold)) {
-											if (is360Difference(lastFewAngles[i].yaw, lastFewAngles[i + 1].yaw)) {
-												continue;
-											}
-
-											data.curcasetempdata.aimbot_infractions.push({ prevAngle: lastFewAngles[i], nextAngle: lastFewAngles[i + 1], tick: demoFile.currentTick });
-										}
-									}
-								}
-							});
+							// Detection
+							Aimbot(demoFile, sid, data, config);
+							AFKing(demoFile, sid, data, config);
 
 							demoFile.parse(buffer);
 
@@ -195,7 +156,7 @@ csgoUser.on("debug", (event) => {
 									rpt_aimbot: (data.curcasetempdata.aimbot_infractions.length > config.verdict.maxAimbot) ? 1 : 0,
 									rpt_wallhack: 0, // TODO: Add detection for wallhacking
 									rpt_speedhack: 0, // TODO: Add detection for other cheats (Ex BunnyHopping)
-									rpt_teamharm: 0, // TODO: Add detection of griefing (Ex Afking, Damaging teammates)
+									rpt_teamharm: (data.curcasetempdata.AFKing_infractions.length > config.verdict.maxAFKing) ? 1 : 0, // TODO: Add detection for damaging teammates
 									reason: 3
 								};
 
@@ -243,7 +204,7 @@ csgoUser.on("debug", (event) => {
 									// Wait this long before sending the request, if we parse the demo too fast the GC ignores us
 									var timer = parseInt((config.parsing.minimumTime * 1000) - (data.parsing.endTimestamp - data.parsing.startTimestamp)) / 1000;
 
-									console.log("Waiting " + parseInt(timer) + " second" + (parseInt(timer) === 1 ? "" : "s") + " to avoid the GC ignoring us");
+									console.log("Waiting " + timer + " second" + (timer === 1 ? "" : "s") + " to avoid the GC ignoring us");
 
 									await new Promise(r => setTimeout(r, (timer * 1000)));
 								}
@@ -265,7 +226,7 @@ csgoUser.on("debug", (event) => {
 
 				setTimeout(() => {
 					data.total.startTimestamp = new Date().getTime();
-					console.log("-----------------\nRequested Overwatch case");
+					console.log("-".repeat(20) + "\nRequested Overwatch case");
 					csgoUser._GC.send({
 						msg: csgoUser.Protos.ECsgoGCMsg.k_EMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate,
 						proto: {}
@@ -287,7 +248,7 @@ csgoUser.on("debug", (event) => {
 			console.log("	Aimbot: " + data.curcasetempdata.aimbot_infractions.length);
 			console.log("	Wallhack: 0");
 			console.log("	Other: 0");
-			console.log("	Griefing: 0");
+			console.log("	Griefing: " + data.curcasetempdata.AFKing_infractions.length);
 			console.log("Timings:");
 			console.log("	Total: " + parseInt((data.total.endTimestamp - data.total.startTimestamp) / 1000) + "s");
 			console.log("	Download: " + parseInt((data.download.endTimestamp - data.download.startTimestamp) / 1000) + "s");
@@ -315,7 +276,7 @@ csgoUser.on("debug", (event) => {
 			// Request a overwatch case after the time has run out
 			setTimeout(() => {
 				data.total.startTimestamp = new Date().getTime();
-				console.log("-----------------\nRequested Overwatch case");
+				console.log("-".repeat(20) + "\nRequested Overwatch case");
 				csgoUser._GC.send({
 					msg: csgoUser.Protos.ECsgoGCMsg.k_EMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate,
 					proto: {}
@@ -338,18 +299,3 @@ csgoUser.on("debug", (event) => {
 		console.log(event);
 	}
 });
-
-// Shitty check for 360 changes
-function is360Difference(angle1, angle2) {
-	// Check 0 < 360
-	if (angle1 <= config.threshold && angle1 >= 0.0 && angle2 <= 360.0 && angle2 >= (360.0 - config.threshold)) {
-		return true;
-	}
-
-	// Check 360 > 0
-	if (angle1 <= 360.0 && angle1 >= (360.0 - config.threshold) && angle2 <= config.threshold && angle2 >= 0.0) {
-		return true;
-	}
-
-	return false;
-}

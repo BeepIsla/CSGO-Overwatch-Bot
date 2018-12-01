@@ -7,13 +7,19 @@
 	"parsing": {
 		"steamWebAPIKey": "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
 		"minimumTime": 240,
-		"maxTicks": 10,
-		"threshold": 1.0
+		"aimbot": {
+			"maxTicks": 10,
+			"threshold": 1.0
+		},
+		"afking": {
+			"radius": 80
+		}
 	},
 	"verdict": {
 		"writeLog": true,
 		"maxVerdicts": 0,
-		"maxAimbot": 20
+		"maxAimbot": 10,
+		"maxAFKing": 3
 	},
 	"other": {
 		"autoDecode": false
