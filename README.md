@@ -1,6 +1,6 @@
 # CSGO Overwatch Bot
 
-Automatically solves Overwatch cases. Although **the detection algorithm for Aimbotting is really bad and there is no Wallhack/Griefing/etc detection**.
+Automatically solves Overwatch cases. Although **the detection algorithm for Aimbotting & AFKing is really bad and there is no Wallhack/Team harm detection**.
 
 When running this you will get some unhandled cases which we simply don't care about.
 
