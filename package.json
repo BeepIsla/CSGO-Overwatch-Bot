@@ -11,7 +11,7 @@
   "license": "AGPL-3.0",
   "dependencies": {
     "almost-equal": "^1.1.0",
-    "demofile": "^1.0.0-beta.1",
+    "demofile": "^1.0.0",
     "request": "^2.88.0",
     "steam": "^1.4.0",
     "steam-totp": "^2.1.0",
