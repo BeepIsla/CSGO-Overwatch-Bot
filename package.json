@@ -2,6 +2,10 @@
   "name": "csgo-overwatch-bot",
   "version": "1.0.0",
   "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BeepFelix/CSGO-Overwatch-Bot.git"
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
