@@ -69,7 +69,7 @@ steamUser.on("error", (err) => {
 });
 
 async function doOverwatchCase() {
-	data.total.startTimestamp = new Date().getTime();
+	data.total.startTimestamp = Date.now();
 	console.log("-".repeat(20) + "\nRequested Overwatch case");
 	let caseUpdate = await csgoUser.sendMessage(
 		730,
@@ -86,7 +86,7 @@ async function doOverwatchCase() {
 
 	if (caseUpdate.caseurl) {
 		data.curcasetempdata.owMsg = caseUpdate;
-		data.download.startTimestamp = new Date().getTime();
+		data.download.startTimestamp = Date.now();
 
 		// Download demo
 		if (fs.existsSync("./demofile.dem")) fs.unlinkSync("./demofile.dem");
@@ -103,7 +103,7 @@ async function doOverwatchCase() {
 		let r = request(caseUpdate.caseurl);
 		r.on("response", (res) => {
 			res.pipe(fs.createWriteStream("./demofile.bz2")).on("close", async () => {
-				data.download.endTimestamp = new Date().getTime();
+				data.download.endTimestamp = Date.now();
 
 				// Successfully downloaded, tell the GC about it!
 				console.log("Finished downloading " + caseUpdate.caseid + ", unpacking...");
@@ -122,15 +122,15 @@ async function doOverwatchCase() {
 					30000
 				);
 
-				data.unpacking.startTimestamp = new Date().getTime();
+				data.unpacking.startTimestamp = Date.now();
 
 				// Parse the demo
 				fs.createReadStream("./demofile.bz2").pipe(bz2()).pipe(fs.createWriteStream("./demofile.dem")).on("close", () => {
-					data.unpacking.endTimestamp = new Date().getTime();
+					data.unpacking.endTimestamp = Date.now();
 
 					fs.unlinkSync("./demofile.bz2");
 
-					data.parsing.startTimestamp = new Date().getTime();
+					data.parsing.startTimestamp = Date.now();
 
 					console.log("Finished unpacking " + caseUpdate.caseid + ", parsing as suspect " + sid.getSteamID64() + "...");
 
@@ -148,7 +148,7 @@ async function doOverwatchCase() {
 						demoFile.parse(buffer);
 
 						demoFile.on("end", async (err) => {
-							data.parsing.endTimestamp = new Date().getTime();
+							data.parsing.endTimestamp = Date.now();
 
 							if (err.error) {
 								console.error(err);
@@ -242,7 +242,7 @@ async function doOverwatchCase() {
 								return;
 							}
 
-							data.total.endTimestamp = new Date().getTime();
+							data.total.endTimestamp = Date.now();
 							data.casesCompleted++;
 
 							// Print logs
