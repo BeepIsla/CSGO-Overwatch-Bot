@@ -4,8 +4,8 @@ module.exports = class Decoder {
 		this.csgoUser = csgoUser;
 		this.protobufs = Object.keys(this.csgoUser.Protos).filter(p => Object.keys(this.csgoUser.Protos[p]).includes("decode"));
 		this.headers = Object.keys(this.csgoUser.Protos).filter(p => !Object.keys(this.csgoUser.Protos[p]).includes("decode")).map((p) => {
-			var keys = Object.keys(this.csgoUser.Protos[p]);
-			var returnValue = {
+			let keys = Object.keys(this.csgoUser.Protos[p]);
+			let returnValue = {
 				main: p,
 				keys: []
 			};
@@ -24,16 +24,16 @@ module.exports = class Decoder {
 
 	decode(event) {
 		// Match headers
-		var matchingHeaders = this.headers.map(h => h.keys).filter((k) => {
-			var index = k.map(n => n.num).indexOf(event.header.msg);
+		let matchingHeaders = this.headers.map(h => h.keys).filter((k) => {
+			let index = k.map(n => n.num).indexOf(event.header.msg);
 			if (index <= -1) {
 				return false;
 			}
 
 			return k[index];
 		}).map((h) => {
-			var main = h[0].main;
-			var keys = h.filter((hh) => {
+			let main = h[0].main;
+			let keys = h.filter((hh) => {
 				if (hh.num !== event.header.msg) {
 					return false;
 				}
@@ -48,10 +48,10 @@ module.exports = class Decoder {
 		});
 
 		// Decode protobufs
-		var decoded = [];
+		let decoded = [];
 		for (let proto of this.protobufs) {
 			try {
-				var msg = this.csgoUser.Protos[proto].decode(event.buffer);
+				let msg = this.csgoUser.Protos[proto].decode(event.buffer);
 				decoded.push({
 					protobuf: proto,
 					decoded: msg
