@@ -280,7 +280,7 @@ async function doOverwatchCase() {
 							}
 
 							// Request a overwatch case after the time has run out
-							setTimeout(doOverwatchCase, ((msg.throttleseconds + 1) * 1000));
+							setTimeout(doOverwatchCase, ((caseUpdate2.throttleseconds + 1) * 1000));
 						});
 					});
 				});
