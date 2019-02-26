@@ -20,8 +20,5 @@
 		"maxVerdicts": 0,
 		"maxAimbot": 10,
 		"maxAFKing": 3
-	},
-	"other": {
-		"autoDecode": false
 	}
 }
