@@ -17,7 +17,7 @@ const steamUser = new SteamUser();
 const csgoUser = new GameCoordinator(steamUser);
 const decoder = new Decoder(csgoUser);
 
-var data = {
+let data = {
 	casesCompleted: 0,
 	total: {
 		startTimestamp: 0,
@@ -43,7 +43,7 @@ var data = {
 	}
 };
 
-var logonSettings = {
+let logonSettings = {
 	accountName: config.account.username,
 	password: config.account.password
 };
@@ -81,7 +81,7 @@ csgoUser.on("debug", (event) => {
 	}
 
 	if (event.header.msg === csgoUser.Protos.ECsgoGCMsg.k_EMsgGCCStrike15_v2_PlayerOverwatchCaseAssignment) {
-		var msg = csgoUser.Protos.CMsgGCCStrike15_v2_PlayerOverwatchCaseAssignment.decode(event.buffer);
+		let msg = csgoUser.Protos.CMsgGCCStrike15_v2_PlayerOverwatchCaseAssignment.decode(event.buffer);
 
 		if (msg.caseurl) {
 			data.curcasetempdata.owMsg = msg;
@@ -91,14 +91,14 @@ csgoUser.on("debug", (event) => {
 			if (fs.existsSync("./demofile.dem")) fs.unlinkSync("./demofile.dem");
 			console.log("Downloading case " + msg.caseid + " from url " + msg.caseurl);
 
-			var sid = SteamID.fromIndividualAccountID(msg.suspectid);
+			let sid = SteamID.fromIndividualAccountID(msg.suspectid);
 			if (!sid.isValid()) {
 				console.log("Got invalid suspect ID " + msg.suspectid);
 				return;
 			}
 			data.curcasetempdata.sid = sid;
 
-			var r = request(msg.caseurl);
+			let r = request(msg.caseurl);
 			r.on("response", (res) => {
 				res.pipe(fs.createWriteStream("./demofile.bz2")).on("close", () => {
 					data.download.endTimestamp = new Date().getTime();
@@ -149,7 +149,7 @@ csgoUser.on("debug", (event) => {
 								console.log("Done parsing case " + msg.caseid);
 
 								// Setup conviction object
-								var convictionObj = {
+								let convictionObj = {
 									caseid: msg.caseid,
 									suspectid: msg.suspectid,
 									fractionid: msg.fractionid,
@@ -162,14 +162,14 @@ csgoUser.on("debug", (event) => {
 
 								// Check the Steam Web API, if a token is provided, if the user is already banned, if so always send a conviction even if the bot didn't detect it
 								if (config.parsing.steamWebAPIKey && config.parsing.steamWebAPIKey.length >= 10) {
-									var banChecker = await new Promise((resolve, reject) => {
+									let banChecker = await new Promise((resolve, reject) => {
 										request("https://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key=" + config.parsing.steamWebAPIKey + "&format=json&steamids=" + sid.getSteamID64(), (err, res, body) => {
 											if (err) {
 												reject(err);
 												return;
 											}
 
-											var json = undefined;
+											let json = undefined;
 											try {
 												json = JSON.parse(body);
 											} catch(e) {};
@@ -202,7 +202,7 @@ csgoUser.on("debug", (event) => {
 
 								if ((data.parsing.endTimestamp - data.parsing.startTimestamp) < (config.parsing.minimumTime * 1000)) {
 									// Wait this long before sending the request, if we parse the demo too fast the GC ignores us
-									var timer = parseInt((config.parsing.minimumTime * 1000) - (data.parsing.endTimestamp - data.parsing.startTimestamp)) / 1000;
+									let timer = parseInt((config.parsing.minimumTime * 1000) - (data.parsing.endTimestamp - data.parsing.startTimestamp)) / 1000;
 
 									console.log("Waiting " + timer + " second" + (timer === 1 ? "" : "s") + " to avoid the GC ignoring us");
 

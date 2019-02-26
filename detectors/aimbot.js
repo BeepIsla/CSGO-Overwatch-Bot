@@ -2,9 +2,9 @@ const SteamID = require("steamid");
 const almostEqual = require("almost-equal");
 
 module.exports = (demoFile, sid, data, config) => {
-	var lastFewAngles = [];
+	let lastFewAngles = [];
 	demoFile.on("tickend", (curTick) => {
-		var ourPlayer = demoFile.players.filter(p => p.steamId !== "BOT" && new SteamID(p.steamId).getSteamID64() === sid.getSteamID64());
+		let ourPlayer = demoFile.players.filter(p => p.steamId !== "BOT" && new SteamID(p.steamId).getSteamID64() === sid.getSteamID64());
 		if (ourPlayer.length <= 0) { // User left
 			lastFewAngles = [];
 			return;
@@ -17,7 +17,7 @@ module.exports = (demoFile, sid, data, config) => {
 	});
 
 	demoFile.gameEvents.on("player_death", (event) => {
-		var attacker = demoFile.entities.getByUserId(event.attacker);
+		let attacker = demoFile.entities.getByUserId(event.attacker);
 		if (!attacker || attacker.steamId === "BOT" || new SteamID(attacker.steamId).getSteamID64() !== sid.getSteamID64()) {
 			return; // Attacker no longer available or not our attacker
 		}
