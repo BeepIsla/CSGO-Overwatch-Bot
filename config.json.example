@@ -19,6 +19,7 @@
 		"writeLog": true,
 		"maxVerdicts": 0,
 		"maxAimbot": 10,
+		"maxWallKills": 7,
 		"maxAFKing": 3
 	}
 }
