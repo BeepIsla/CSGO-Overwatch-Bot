@@ -10,6 +10,8 @@ When running this you will get some unhandled cases which we simply don't care a
 - - Log the past X ticks, when the suspect gets a kill check all angles within the past X ticks. If the difference is above the threshold add an infraction.
 - **AFKing**:
 - - Everytime the round starts log the current position of the player on every tick, at the end of the round compare all the positions. If the player did not leave a specific radius within the entire round add an infraction.
+- **Wallhack**:
+- - On every kill just check if the event included the `penetrated` parameter and if its 1 or higher, meaning the last bullet was a wallbang. It will not work when the player only damages through a wall instead of killing.
 
 # Config
 
@@ -29,9 +31,8 @@ When running this you will get some unhandled cases which we simply don't care a
 - - `writeLog`: Should we write logs to a file?
 - - `maxVerdicts`: The maximum amount of cases we want to do. 0 for infinite
 - - `maxAimbot`: The maximum amount of infractions allowed before setting user as aimbotter
+- - `maxWallKills`: Maximum amount of allowed kills through a wall before setting user as wallhacking
 - - `maxAFKing`: The maximum amount of infractions allowed before setting user as griefing
-- `other`
-- - `autoDecode`: Automatically try to decode an incoming unhandled message
 
 # GameCoordinator
 

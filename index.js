@@ -37,7 +37,8 @@ let data = {
 		sid: undefined,
 		owMsg: undefined,
 		aimbot_infractions: [],
-		AFKing_infractions: []
+		AFKing_infractions: [],
+		Wallhack_infractions: []
 	}
 };
 
@@ -139,11 +140,26 @@ async function doOverwatchCase() {
 
 						data.curcasetempdata.aimbot_infractions = [];
 
+						let lastProg = -1;
 						const demoFile = new demofile.DemoFile();
 
 						// Detection
 						Aimbot(demoFile, sid, data, config);
 						AFKing(demoFile, sid, data, config);
+
+						demoFile.on("progress", (progressFraction) => {
+							let prog = Math.round(progressFraction * 100);
+							if (prog % 10 !== 0) {
+								return;
+							}
+
+							if (prog === lastProg) {
+								return;
+							}
+
+							lastProg = prog;
+							console.log("Parsing demo: " + prog + "%");
+						});
 
 						demoFile.parse(buffer);
 
@@ -162,7 +178,7 @@ async function doOverwatchCase() {
 								suspectid: caseUpdate.suspectid,
 								fractionid: caseUpdate.fractionid,
 								rpt_aimbot: (data.curcasetempdata.aimbot_infractions.length > config.verdict.maxAimbot) ? 1 : 0,
-								rpt_wallhack: 0, // TODO: Add detection for wallhacking
+								rpt_wallhack: (data.curcasetempdata.Wallhack_infractions.length > config.verdict.maxWallKills) ? 1 : 0, // TODO: Add detection for looking at enemies through walls
 								rpt_speedhack: 0, // TODO: Add detection for other cheats (Ex BunnyHopping)
 								rpt_teamharm: (data.curcasetempdata.AFKing_infractions.length > config.verdict.maxAFKing) ? 1 : 0, // TODO: Add detection for damaging teammates
 								reason: 3
@@ -280,7 +296,7 @@ async function doOverwatchCase() {
 							}
 
 							// Request a overwatch case after the time has run out
-							setTimeout(doOverwatchCase, ((msg.throttleseconds + 1) * 1000));
+							setTimeout(doOverwatchCase, ((caseUpdate2.throttleseconds + 1) * 1000));
 						});
 					});
 				});
