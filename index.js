@@ -8,6 +8,7 @@ const SteamID = require("steamid");
 
 const Aimbot = require("./detectors/aimbot.js");
 const AFKing = require("./detectors/AFKing.js");
+const Wallhack = require("./detectors/wallhack.js");
 
 const Version = require("./helpers/Version.js");
 const GameCoordinator = require("./helpers/GameCoordinator.js");
@@ -66,7 +67,9 @@ steamUser.once("loggedOn", async () => {
 		let res = await Version().catch(console.error);
 
 		if (package.version !== res) {
-			console.log("A new version is available on Github @ " + package.description.url.split(".").shift());
+			let repoURL = package.repository.url.split(".");
+			repoURL.pop();
+			console.log("A new version is available on Github @ " + repoURL.join("."));
 			console.log("Downloading is optional but recommended. Make sure to check if there are any new values to be added in your old \"config.json\"");
 		} else {
 			console.log("Up to date!");
@@ -165,6 +168,7 @@ async function doOverwatchCase() {
 						// Detection
 						Aimbot(demoFile, sid, data, config);
 						AFKing(demoFile, sid, data, config);
+						Wallhack(demoFile, sid, data, config);
 
 						demoFile.on("progress", (progressFraction) => {
 							let prog = Math.round(progressFraction * 100);
@@ -286,7 +290,7 @@ async function doOverwatchCase() {
 							console.log("Suspect: " + (data.curcasetempdata.sid ? data.curcasetempdata.sid.getSteamID64() : 0));
 							console.log("Infractions:");
 							console.log("	Aimbot: " + data.curcasetempdata.aimbot_infractions.length);
-							console.log("	Wallhack: 0");
+							console.log("	Wallhack: " + data.curcasetempdata.Wallhack_infractions.length);
 							console.log("	Other: 0");
 							console.log("	Griefing: " + data.curcasetempdata.AFKing_infractions.length);
 							console.log("Timings:");
