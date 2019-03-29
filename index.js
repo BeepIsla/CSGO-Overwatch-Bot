@@ -9,6 +9,7 @@ const SteamID = require("steamid");
 const Aimbot = require("./detectors/aimbot.js");
 const AFKing = require("./detectors/AFKing.js");
 
+const Version = require("./helpers/Version.js");
 const GameCoordinator = require("./helpers/GameCoordinator.js");
 const config = require("./config.json");
 
@@ -54,9 +55,27 @@ if (config.account.sharedSecret && config.account.sharedSecret.length > 5) {
 steamUser.logOn(logonSettings);
 
 steamUser.once("loggedOn", async () => {
-	console.log("Logged in");
+	console.log("Successfully logged into " + steamUser.steamID.toString());
 	steamUser.setPersona(SteamUser.EPersonaState.Online);
 	steamUser.gamesPlayed([730]);
+
+	console.log("Checking for updates...");
+
+	try {
+		let package = JSON.parse(fs.readFileSync("./package.json"));
+		let res = await Version().catch(console.error);
+
+		if (package.version !== res) {
+			console.log("A new version is available on Github @ " + package.description.url.split(".").shift());
+			console.log("Downloading is optional but recommended. Make sure to check if there are any new values to be added in your old \"config.json\"");
+		} else {
+			console.log("Up to date!");
+		}
+	} catch(e) {
+		console.log("Failed to check for updates");
+	}
+
+	console.log("Establishing CSGO GameCoordinator connection...");
 
 	await csgoUser.start();
 
