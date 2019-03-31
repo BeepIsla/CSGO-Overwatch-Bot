@@ -1,6 +1,6 @@
 {
   "name": "csgo-overwatch-bot",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "repository": {
     "type": "git",
@@ -17,6 +17,7 @@
     "almost-equal": "^1.1.0",
     "bytebuffer": "^5.0.1",
     "demofile": "^1.0.4",
+    "inquirer": "^6.2.2",
     "protobufjs": "github:dcodeIO/protobuf.js#ProtoBuf4",
     "request": "^2.88.0",
     "steam-totp": "^2.1.0",
