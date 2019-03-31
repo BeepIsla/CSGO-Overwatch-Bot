@@ -1,24 +1,23 @@
-const SteamID = require("steamid");
 const almostEqual = require("almost-equal");
 
 module.exports = (demoFile, sid, data, config) => {
 	let startPosition = [];
 	let positionEachTickBetweenRounds = [];
-	demoFile.on("tickend", (curTick) => {
-		let ourPlayer = demoFile.players.filter(p => p.steamId !== "BOT" && new SteamID(p.steamId).getSteamID64() === sid.getSteamID64());
-		if (ourPlayer.length <= 0) { // User left
+	demoFile.on("tickend__", (tick) => {
+		if (tick.player <= -1) {
 			positionEachTickBetweenRounds = [];
 			startPosition = [];
 			return;
 		}
 
-		positionEachTickBetweenRounds.push(ourPlayer[0].position);
+		let ourPlayer = demoFile.players[tick.player];
+		positionEachTickBetweenRounds.push(ourPlayer.position);
 	});
 
 	demoFile.on("round_freeze_end", () => {
 		positionEachTickBetweenRounds = [];
 
-		let ourPlayer = demoFile.players.filter(p => p.steamId !== "BOT" && new SteamID(p.steamId).getSteamID64() === sid.getSteamID64());
+		let ourPlayer = demoFile.players.filter(p => p.steam64Id !== "BOT" && p.steam64Id === sid.getSteamID64());
 		if (ourPlayer.length <= 0) { // User left
 			positionEachTickBetweenRounds = [];
 			startPosition = [];

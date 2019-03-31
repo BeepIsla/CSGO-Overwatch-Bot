@@ -1,15 +1,15 @@
-const SteamID = require("steamid");
 const almostEqual = require("almost-equal");
 
 module.exports = (demoFile, sid, data, config) => {
 	let lastFewAngles = [];
-	demoFile.on("tickend", (curTick) => {
-		let ourPlayer = demoFile.players.filter(p => p.steamId !== "BOT" && new SteamID(p.steamId).getSteamID64() === sid.getSteamID64());
-		if (ourPlayer.length <= 0) { // User left
+	demoFile.on("tickend__", (tick) => {
+		if (tick.player <= -1) {
 			lastFewAngles = [];
 			return;
 		}
-		lastFewAngles.push(ourPlayer[0].eyeAngles);
+
+		let ourPlayer = demoFile.players[tick.player];
+		lastFewAngles.push(ourPlayer.eyeAngles);
 
 		if (lastFewAngles.length >= config.parsing.aimbot.maxTicks) {
 			lastFewAngles.shift();
@@ -18,7 +18,7 @@ module.exports = (demoFile, sid, data, config) => {
 
 	demoFile.gameEvents.on("player_death", (event) => {
 		let attacker = demoFile.entities.getByUserId(event.attacker);
-		if (!attacker || attacker.steamId === "BOT" || new SteamID(attacker.steamId).getSteamID64() !== sid.getSteamID64()) {
+		if (!attacker || attacker.steam64Id === "BOT" || attacker.steam64Id !== sid.getSteamID64()) {
 			return; // Attacker no longer available or not our attacker
 		}
 

@@ -18,18 +18,7 @@ let data = {
 	}
 };
 
-inquire.prompt([
-	{
-		type: "input",
-		name: "path",
-		message: "Enter the name of the demo:"
-	},
-	{
-		type: "input",
-		name: "suspect",
-		message: "Suspect SteamID:"
-	}
-]).then((result) => {
+getResponse().then((result) => {
 	if (result.path.trim().length <= 0) {
 		console.log("No path entered");
 		return;
@@ -58,7 +47,7 @@ inquire.prompt([
 		return;
 	}
 
-	fs.readFile("./demofile.dem", (err, buffer) => {
+	fs.readFile(filepath, (err, buffer) => {
 		if (err) {
 			console.error(err);
 			return;
@@ -67,7 +56,20 @@ inquire.prompt([
 		console.log("Parsing demo " + result.path.trim() + " with suspect " + sid.getSteamID64());
 
 		let lastProg = -1;
+		let playerIndex = -1;
 		const demoFile = new demofile.DemoFile();
+
+		demoFile.gameEvents.on("player_connect", () => {
+			playerIndex = demoFile.players.map(p => p.steamId === "BOT" ? p.steamId : new SteamID(p.steamId).getSteamID64()).indexOf(sid.getSteamID64());
+		});
+
+		demoFile.gameEvents.on("player_disconnect", () => {
+			playerIndex = demoFile.players.map(p => p.steamId === "BOT" ? p.steamId : new SteamID(p.steamId).getSteamID64()).indexOf(sid.getSteamID64());
+		});
+
+		demoFile.on("tickend", (curTick) => {
+			demoFile.emit("tickend__", { curTick: curTick, player: playerIndex });
+		});
 
 		// Detection
 		Aimbot(demoFile, sid, data, config);
@@ -104,3 +106,34 @@ inquire.prompt([
 		});
 	});
 });
+
+// Stuff for easier debugging in Visual Studio Code
+function getResponse() {
+	if (isDebugging() === true) {
+		return new Promise((resolve, reject) => {
+			resolve({
+				path: "rage.dem",
+				suspect: "76561198947227167"
+			});
+		});
+	} else {
+		return inquire.prompt([
+			{
+				type: "input",
+				name: "path",
+				message: "Enter the name of the demo:"
+			},
+			{
+				type: "input",
+				name: "suspect",
+				message: "Suspect SteamID:"
+			}
+		]);
+	}
+}
+
+function isDebugging() {
+	// Doesnt detect if a debugger is attached after launch but I do not need that for Visual Studio Code
+	const argv = process.execArgv.join();
+	return argv.includes("inspect-brk") || argv.includes("debug");
+}
