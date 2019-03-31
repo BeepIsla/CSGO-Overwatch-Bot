@@ -1,8 +1,20 @@
 # CSGO Overwatch Bot
 
-Automatically solves Overwatch cases. Although **the detection algorithm for Aimbotting & AFKing is really bad and there is no Wallhack/Team harm detection**.
+Automatically solves Overwatch cases. Although **the detection algorithm for Aimbotting, AFKing & Wallhack are really bad and there is no Team harm detection**.
 
 When running this you will get some unhandled cases which we simply don't care about.
+
+You can forcefully parse a demo by simply putting it in the directory and running `node force.js`. You will get prompted to enter the name of the demo and the SteamID of your suspect.
+
+# Installation
+
+1. Install [NodeJS](https://nodejs.org/)
+2. Clone this repository and extract it in a folder
+3. Open a command prompt inside the folder
+4. Run `npm install`
+5. Make a duplicate of the `config.json.example` and remove the `.example`
+6. Adjust your now called `config.json` - [See Config](#config)
+7. Run `node index.js`
 
 # Detections
 
