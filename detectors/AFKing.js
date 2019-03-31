@@ -11,6 +11,12 @@ module.exports = (demoFile, sid, data, config) => {
 		}
 
 		let ourPlayer = demoFile.players[tick.player];
+		if (typeof ourPlayer === "undefined") {
+			positionEachTickBetweenRounds = [];
+			startPosition = [];
+			return;
+		}
+
 		positionEachTickBetweenRounds.push(ourPlayer.position);
 	});
 
