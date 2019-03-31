@@ -74,7 +74,7 @@ steamUser.once("loggedOn", async () => {
 		} else {
 			console.log("Up to date!");
 		}
-	} catch(e) {
+	} catch (e) {
 		console.log("Failed to check for updates");
 	}
 
@@ -163,7 +163,20 @@ async function doOverwatchCase() {
 						data.curcasetempdata.aimbot_infractions = [];
 
 						let lastProg = -1;
+						let playerIndex = -1;
 						const demoFile = new demofile.DemoFile();
+
+						demoFile.gameEvents.on("player_connect", () => {
+							playerIndex = demoFile.players.map(p => p.steamId === "BOT" ? p.steamId : new SteamID(p.steamId).getSteamID64()).indexOf(sid.getSteamID64());
+						});
+
+						demoFile.gameEvents.on("player_disconnect", () => {
+							playerIndex = demoFile.players.map(p => p.steamId === "BOT" ? p.steamId : new SteamID(p.steamId).getSteamID64()).indexOf(sid.getSteamID64());
+						});
+
+						demoFile.on("tickend", (curTick) => {
+							demoFile.emit("tickend__", { curTick: curTick, player: playerIndex });
+						});
 
 						// Detection
 						Aimbot(demoFile, sid, data, config);
