@@ -56,7 +56,7 @@ if (config.account.sharedSecret && config.account.sharedSecret.length > 5) {
 
 steamUser.logOn(logonSettings);
 
-steamUser.once("loggedOn", async () => {
+steamUser.on("loggedOn", async () => {
 	console.log("Successfully logged into " + steamUser.steamID.toString());
 	steamUser.setPersona(SteamUser.EPersonaState.Online);
 	steamUser.gamesPlayed([730]);
