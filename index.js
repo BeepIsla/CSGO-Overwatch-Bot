@@ -38,6 +38,7 @@ let data = {
 	curcasetempdata: {
 		sid: undefined,
 		owMsg: undefined,
+		wasAlreadyConvicted: false,
 		aimbot_infractions: [],
 		AFKing_infractions: [],
 		Wallhack_infractions: []
@@ -163,6 +164,7 @@ async function doOverwatchCase() {
 						data.curcasetempdata.aimbot_infractions = [];
 						data.curcasetempdata.AFKing_infractions = [];
 						data.curcasetempdata.Wallhack_infractions = [];
+						data.curcasetempdata.wasAlreadyConvicted = false;
 
 						let lastProg = -1;
 						let playerIndex = -1;
@@ -257,8 +259,12 @@ async function doOverwatchCase() {
 									convictionObj.rpt_wallhack = 1;
 
 									console.log("Suspect is already banned. Forcefully convicting...");
+
+									data.curcasetempdata.wasAlreadyConvicted = true;
 								} else {
 									console.log("Suspect has not been banned yet according to the Steam API");
+
+									data.curcasetempdata.wasAlreadyConvicted = false;
 								}
 							}
 
