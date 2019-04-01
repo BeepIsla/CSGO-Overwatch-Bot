@@ -160,7 +160,13 @@ async function doOverwatchCase() {
 					fs.readFile("./demofile.dem", (err, buffer) => {
 						if (err) return console.error(err);
 
-						data.curcasetempdata.aimbot_infractions = [];
+						data.curcasetempdata = {
+							sid: undefined,
+							owMsg: undefined,
+							aimbot_infractions: [],
+							AFKing_infractions: [],
+							Wallhack_infractions: []
+						}
 
 						let lastProg = -1;
 						let playerIndex = -1;
