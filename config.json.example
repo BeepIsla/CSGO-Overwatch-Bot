@@ -21,5 +21,8 @@
 		"maxAimbot": 10,
 		"maxWallKills": 7,
 		"maxAFKing": 3
+	},
+	"richPresence": {
+		"steam_display": "#display_overwatch"
 	}
 }

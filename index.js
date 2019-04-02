@@ -59,7 +59,6 @@ steamUser.logOn(logonSettings);
 steamUser.on("loggedOn", async () => {
 	console.log("Successfully logged into " + steamUser.steamID.toString());
 	steamUser.setPersona(SteamUser.EPersonaState.Online);
-	steamUser.gamesPlayed([730]);
 
 	console.log("Checking for updates...");
 
@@ -80,8 +79,13 @@ steamUser.on("loggedOn", async () => {
 	}
 
 	console.log("Establishing CSGO GameCoordinator connection...");
-
+	steamUser.gamesPlayed([730]);
 	await csgoUser.start();
+
+	if (typeof config.richPresence !== "undefined") {
+		console.log("Setting Rich Presence...");
+		steamUser.uploadRichPresence(730, config.richPresence);
+	}
 
 	doOverwatchCase();
 });
