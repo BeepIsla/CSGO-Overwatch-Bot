@@ -58,6 +58,8 @@ There **MUST** always be a `steam_display` parameter and it **MUST** be a string
 
 If you want to display the default text enter invalid text, completely omit `richPresence` or set `richPresence` to an empty object (`{}`).
 
+You can view the current Rich Presence keys and values in your browser [on Steam](https://steamcommunity.com/dev/testrichpresence) if you are logged in.
+
 ## Example 1 (Basic):
 
 Set `steam_display` to `#display_watch` to display `Watching a CS:GO Match`
