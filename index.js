@@ -10,7 +10,7 @@ const Aimbot = require("./detectors/aimbot.js");
 const AFKing = require("./detectors/AFKing.js");
 const Wallhack = require("./detectors/wallhack.js");
 
-const Version = require("./helpers/Version.js");
+const Helper = require("./helpers/Helper.js");
 const GameCoordinator = require("./helpers/GameCoordinator.js");
 const config = require("./config.json");
 
@@ -64,7 +64,7 @@ steamUser.on("loggedOn", async () => {
 
 	try {
 		let package = JSON.parse(fs.readFileSync("./package.json"));
-		let res = await Version().catch(console.error);
+		let res = await Helper.GetLatestVersion().catch(console.error);
 
 		if (package.version !== res) {
 			let repoURL = package.repository.url.split(".");
@@ -86,6 +86,48 @@ steamUser.on("loggedOn", async () => {
 		console.log("Setting Rich Presence...");
 		steamUser.uploadRichPresence(730, config.richPresence);
 	}
+
+	let lang = (await Helper.DownloadLanguage("csgo_english.txt")).lang;
+
+	let mmHello = await csgoUser.sendMessage(
+		730,
+		csgoUser.Protos.csgo.ECsgoGCMsg.k_EMsgGCCStrike15_v2_MatchmakingClient2GCHello,
+		{},
+		csgoUser.Protos.csgo.CMsgGCCStrike15_v2_MatchmakingClient2GCHello,
+		{},
+		csgoUser.Protos.csgo.ECsgoGCMsg.k_EMsgGCCStrike15_v2_MatchmakingGC2ClientHello,
+		csgoUser.Protos.csgo.CMsgGCCStrike15_v2_MatchmakingGC2ClientHello,
+		30000
+	);
+
+	let rank = mmHello.ranking;
+	if (rank.rank_type_id !== 6) {
+		rank = await csgoUser.sendMessage(
+			730,
+			csgoUser.Protos.csgo.ECsgoGCMsg.k_EMsgGCCStrike15_v2_ClientGCRankUpdate,
+			{},
+			csgoUser.Protos.csgo.CMsgGCCStrike15_v2_ClientGCRankUpdate,
+			{
+				rankings: {
+					rank_type_id: 6
+				}
+			},
+			csgoUser.Protos.csgo.ECsgoGCMsg.k_EMsgGCCStrike15_v2_ClientGCRankUpdate,
+			csgoUser.Protos.csgo.CMsgGCCStrike15_v2_ClientGCRankUpdate,
+			30000
+		);
+
+		rank = rank.rankings[0];
+	}
+
+	console.log("We are " + lang.Tokens["skillgroup_" + rank.rank_id] + " with " + rank.wins + " win" + (rank.wins === 1 ? "" : "s"));
+	if (rank.rank_id < 7 || rank.wins < 150) {
+		console.log((rank.rank_id < 7 ? "Our rank is too low" : "We do not have enough wins") + " in order to request Overwatch cases. You need at least 150 wins and " + lang.Tokens["skillgroup_7"] + ".");
+		steamUser.logOff();
+		return;
+	}
+
+	console.log("We are likely able to request Overwatch cases. Trying to start case handler...");
 
 	doOverwatchCase();
 });
