@@ -7,7 +7,7 @@ module.exports = (demoFile, sid, data, config) => {
 
 		// TODO: Change this to be based on damage instead of death
 		if (event.penetrated > 0) {
-			data.curcasetempdata.Wallhack_infractions.push(event.penetrated);
+			data.curcasetempdata.Wallhack_infractions.push(demoFile.currentTick);
 		}
 	});
 };
