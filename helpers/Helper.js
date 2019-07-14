@@ -1,5 +1,10 @@
 const request = require("request");
 const vdf = require("vdf");
+const SteamUser = require("steam-user");
+const path = require("path");
+const fs = require("fs");
+const unzipper = require("unzipper");
+const GameCoordinator = require("./GameCoordinator.js");
 
 module.exports = class Helper {
 	static GetLatestVersion() {
@@ -64,5 +69,46 @@ module.exports = class Helper {
 				resolve(obj);
 			});
 		});
+	}
+
+	static downloadProtobufs(dir) {
+		return new Promise(async (resolve, reject) => {
+			let newProDir = path.join(dir, "Protobufs-master");
+			if (fs.existsSync(newProDir)) {
+				await this.deleteRecursive(newProDir);
+			}
+
+			// Yes I know the ones I download here are technically not the same as the ones in the submodule
+			// but that doesn't really matter, I doubt Valve will do any major changes with the protobufs I use here anyways
+			let r = request("https://github.com/SteamDatabase/Protobufs/archive/master.zip");
+			let pipe = r.pipe(unzipper.Extract({ path: dir }));
+			pipe.on("close", async () => {
+				let proDir = path.join(dir, "protobufs");
+				if (fs.existsSync(proDir)) {
+					await this.deleteRecursive(proDir);
+				}
+
+				fs.rename(newProDir, proDir, (err) => {
+					if (err) {
+						reject(err);
+						return;
+					}
+
+					resolve();
+				});
+			});
+			pipe.on("error", reject);
+		});
+	}
+
+	static verifyProtobufs() {
+		let user = new SteamUser();
+		let gc = new GameCoordinator(user);
+
+		try {
+			return typeof gc.Protos.csgo.EGCBaseClientMsg.k_EMsgGCClientHello === "number";
+		} catch (e) {
+			return false;
+		}
 	}
 }

@@ -15,7 +15,7 @@ const GameCoordinator = require("./helpers/GameCoordinator.js");
 const config = require("./config.json");
 
 const steamUser = new SteamUser();
-const csgoUser = new GameCoordinator(steamUser);
+let csgoUser = undefined;
 
 let data = {
 	casesCompleted: 0,
@@ -59,6 +59,17 @@ steamUser.logOn(logonSettings);
 steamUser.on("loggedOn", async () => {
 	console.log("Successfully logged into " + steamUser.steamID.toString());
 	steamUser.setPersona(SteamUser.EPersonaState.Online);
+
+	console.log("Checking protobufs...");
+	let foundProtobufs = Helper.verifyProtobufs();
+	if (foundProtobufs) {
+		console.log("Found protobufs");
+	} else {
+		console.log("Failed to find protobufs, downloading and extracting...");
+		await Helper.downloadProtobufs(__dirname);
+	}
+
+	csgoUser = new GameCoordinator(steamUser);
 
 	console.log("Checking for updates...");
 
