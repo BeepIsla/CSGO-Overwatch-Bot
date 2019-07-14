@@ -18,7 +18,7 @@
     "bytebuffer": "^5.0.1",
     "demofile": "^1.0.6",
     "inquirer": "^6.2.2",
-    "protobufjs": "github:dcodeIO/protobuf.js#ProtoBuf4",
+    "protobufjs": "^6.8.8",
     "request": "^2.88.0",
     "steam-totp": "^2.1.0",
     "steam-user": "^4.4.4",
