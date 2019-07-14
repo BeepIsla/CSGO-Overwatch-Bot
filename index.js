@@ -17,6 +17,13 @@ const config = require("./config.json");
 const steamUser = new SteamUser();
 let csgoUser = undefined;
 
+process.on("unhandledRejection", (reason, promise) => {
+	console.error("A request failed to run. Github, Steam or CSGO might currently be offline. Logging out...");
+
+	// The process should exit automatically once Steam has successfully logged off
+	steamUser.logOff();
+});
+
 let data = {
 	casesCompleted: 0,
 	total: {
