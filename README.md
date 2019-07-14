@@ -42,6 +42,7 @@ You can forcefully parse a demo by simply putting it in the directory and runnin
 - - - `radius`: If a player is within this radius an entire round it counts as an AFKing-Infraction
 - `verdict`
 - - `writeLog`: Should we write logs to a file?
+- - `backupDemo`: Should we backup the demo file?
 - - `maxVerdicts`: The maximum amount of cases we want to do. 0 for infinite
 - - `maxAimbot`: The maximum amount of infractions allowed before setting user as aimbotter
 - - `maxWallKills`: Maximum amount of allowed kills through a wall before setting user as wallhacking

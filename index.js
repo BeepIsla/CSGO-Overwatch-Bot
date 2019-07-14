@@ -390,10 +390,26 @@ async function doOverwatchCase() {
 									fs.mkdirSync("./cases");
 								}
 
+								if (!fs.existsSync("./cases/" + caseUpdate2.caseid)) {
+									fs.mkdirSync("./cases/" + caseUpdate2.caseid);
+								}
+
 								// Write case file
-								fs.mkdirSync("./cases/" + caseUpdate2.caseid);
 								fs.writeFileSync("./cases/" + caseUpdate2.caseid + "/message.json", JSON.stringify(data.curcasetempdata.owMsg, null, 4));
 								fs.writeFileSync("./cases/" + caseUpdate2.caseid + "/data.json", JSON.stringify(data, null, 4));
+							}
+
+							if (config.verdict.backupDemo) {
+								if (!fs.existsSync("./cases")) {
+									fs.mkdirSync("./cases");
+								}
+
+								if (!fs.existsSync("./cases/" + caseUpdate2.caseid)) {
+									fs.mkdirSync("./cases/" + caseUpdate2.caseid);
+								}
+
+								// Copy demo
+								fs.copyFileSync("./demofile.dem", "./cases/" + caseUpdate2.caseid + "/demofile.dem");
 							}
 
 							// Check case limit
