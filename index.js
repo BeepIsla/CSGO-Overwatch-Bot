@@ -100,11 +100,6 @@ steamUser.on("loggedOn", async () => {
 	steamUser.gamesPlayed([730]);
 	await csgoUser.start();
 
-	if (typeof config.richPresence !== "undefined") {
-		console.log("Setting Rich Presence...");
-		steamUser.uploadRichPresence(730, config.richPresence);
-	}
-
 	let lang = (await Helper.DownloadLanguage("csgo_english.txt")).lang;
 
 	let mmHello = await csgoUser.sendMessage(
@@ -157,6 +152,11 @@ steamUser.on("error", (err) => {
 });
 
 async function doOverwatchCase() {
+	// Redo this every case incase of a short connection loss which reset our presence
+	if (typeof config.richPresence !== "undefined") {
+		steamUser.uploadRichPresence(730, config.richPresence);
+	}
+
 	data.total.startTimestamp = Date.now();
 	console.log("-".repeat(20) + "\nRequested Overwatch case");
 	let caseUpdate = await csgoUser.sendMessage(
