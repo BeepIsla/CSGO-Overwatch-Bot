@@ -19,6 +19,7 @@ module.exports = class GameCoordinator extends Events {
 		]);
 		this._GCHelloInterval = null;
 		this.startPromise = null;
+		this.startTimeout = null;
 
 		steamUser.on("receivedFromGC", (appid, msgType, payload) => {
 			if (appid === 730) {
@@ -28,10 +29,16 @@ module.exports = class GameCoordinator extends Events {
 						this._GCHelloInterval = null;
 					}
 
-					if (this.startPromise !== null) {
+					if (this.startPromise) {
 						let msg = this.Protos.csgo.CMsgClientWelcome.decode(payload);
+						msg = this.Protos.csgo.CMsgClientWelcome.toObject(msg, { defaults: true });
 						this.startPromise(msg);
 						this.startPromise = null;
+					}
+
+					if (this.startTimeout) {
+						clearTimeout(this.startTimeout);
+						this.startTimeout = null;
 					}
 				}
 
@@ -42,10 +49,26 @@ module.exports = class GameCoordinator extends Events {
 		});
 	}
 
-	start() {
+	start(timeout = 20000) {
 		return new Promise((resolve, reject) => {
+			this.startTimeout = setTimeout(() => {
+				if (this._GCHelloInterval) {
+					clearInterval(this._GCHelloInterval);
+					this._GCHelloInterval = null;
+				}
+
+				if (this.startPromise) {
+					this.startPromise = null;
+				}
+
+				reject(new Error("GC connection timeout"));
+			}, timeout);
+
 			this._GCHelloInterval = setInterval(() => {
-				this.steamUser.sendToGC(730, this.Protos.csgo.EGCBaseClientMsg.k_EMsgGCClientHello, {} , new this.Protos.csgo.CMsgClientHello({}).toBuffer());
+				let message = this.Protos.csgo.CMsgClientHello.create({});
+				let encoded = this.Protos.csgo.CMsgClientHello.encode(message);
+
+				this.steamUser.sendToGC(730, this.Protos.csgo.EGCBaseClientMsg.k_EMsgGCClientHello, {} , encoded.finish());
 			}, 5000);
 
 			this.startPromise = resolve;
@@ -66,13 +89,19 @@ module.exports = class GameCoordinator extends Events {
 	 */
 	sendMessage(appid, header, proto, protobuf, settings, responseHeader, responseProtobuf, timeout = 30000) {
 		return new Promise((resolve, reject) => {
-			if (typeof appid === "undefined") {
+			if (!appid) {
+				let encoded = settings;
+				if (protobuf) {
+					let message = protobuf.create(settings);
+					encoded = protobuf.encode(message);
+				}
+
 				this.steamUser._send({
 					msg: header,
 					proto: proto
-				}, typeof protobuf === "undefined" ? settings : new protobuf(settings).toBuffer());
+				}, protobuf ? encoded.finish() : encoded);
 
-				if (typeof responseHeader === "undefined") {
+				if (!responseHeader) {
 					resolve();
 					return;
 				}
@@ -88,18 +117,19 @@ module.exports = class GameCoordinator extends Events {
 						}
 					}
 
-					if (typeof responseProtobuf === "undefined") {
+					if (!responseProtobuf) {
 						if (body instanceof Buffer || body instanceof ByteBuffer) {
 							resolve(body);
 							return;
 						}
 
-						resolve(new responseProtobuf(body).toBuffer());
+						resolve(body);
 						return;
 					}
 
 					if (body instanceof Buffer || body instanceof ByteBuffer) {
-						body = responseProtobuf.decode(body);
+						body = responseProtobuf.decode(body)
+						body = responseProtobuf.toObject(body, { defaults: true });
 					}
 
 					resolve(body);
@@ -107,9 +137,14 @@ module.exports = class GameCoordinator extends Events {
 				return;
 			}
 
-			this.steamUser.sendToGC(appid, header, proto, typeof protobuf === "undefined" ? settings : new protobuf(settings).toBuffer());
+			let encoded = settings;
+			if (protobuf) {
+				let message = protobuf.create(settings);
+				encoded = protobuf.encode(message);
+			}
+			this.steamUser.sendToGC(appid, header, proto, protobuf ? encoded.finish() : encoded);
 
-			if (typeof responseHeader === "undefined") {
+			if (!responseHeader) {
 				resolve();
 				return;
 			}
@@ -125,12 +160,13 @@ module.exports = class GameCoordinator extends Events {
 					clearTimeout(sendTimeout);
 					this.removeListener("allMsg", sendMessageResponse);
 
-					if (typeof responseProtobuf === "undefined") {
+					if (!responseProtobuf) {
 						resolve(payload);
 						return;
 					}
 
 					let msg = responseProtobuf.decode(payload);
+					msg = responseProtobuf.toObject(msg, { defaults: true });
 					resolve(msg);
 				}
 			}
