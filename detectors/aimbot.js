@@ -14,7 +14,8 @@ module.exports = (demoFile, sid, data, config) => {
 			return;
 		}
 
-		lastFewAngles.push(ourPlayer.eyeAngles);
+		// Duplicate the object so no original data gets used
+		lastFewAngles.push({ ...ourPlayer.eyeAngles });
 
 		if (lastFewAngles.length >= config.parsing.aimbot.maxTicks) {
 			lastFewAngles.shift();
@@ -27,26 +28,29 @@ module.exports = (demoFile, sid, data, config) => {
 			return; // Attacker no longer available or not our attacker
 		}
 
-		for (let i = 0; i < lastFewAngles.length; i++) {
+		// Duplicate the array so no original data gets used
+		let angles = [...lastFewAngles];
+
+		for (let i = 0; i < angles.length; i++) {
 			// Check pitch
-			if (typeof lastFewAngles[i] !== "undefined" && typeof lastFewAngles[i + 1] !== "undefined") {
-				if (!almostEqual(lastFewAngles[i].pitch, lastFewAngles[i + 1].pitch, config.parsing.aimbot.threshold)) {
-					if (is360Difference(lastFewAngles[i].pitch, lastFewAngles[i + 1].pitch)) {
+			if (typeof angles[i] !== "undefined" && typeof angles[i + 1] !== "undefined") {
+				if (!almostEqual(angles[i].pitch, angles[i + 1].pitch, config.parsing.aimbot.threshold)) {
+					if (is360Difference(angles[i].pitch, angles[i + 1].pitch)) {
 						continue;
 					}
 
-					data.curcasetempdata.aimbot_infractions.push({ prevAngle: lastFewAngles[i], nextAngle: lastFewAngles[i + 1], tick: demoFile.currentTick });
+					data.curcasetempdata.aimbot_infractions.push({ prevAngle: angles[i], nextAngle: angles[i + 1], tick: demoFile.currentTick });
 				}
 			}
 
 			// Check yaw
-			if (typeof lastFewAngles[i] !== "undefined" && typeof lastFewAngles[i + 1] !== "undefined") {
-				if (!almostEqual(lastFewAngles[i].yaw, lastFewAngles[i + 1].yaw, config.parsing.aimbot.threshold)) {
-					if (is360Difference(lastFewAngles[i].yaw, lastFewAngles[i + 1].yaw)) {
+			if (typeof angles[i] !== "undefined" && typeof angles[i + 1] !== "undefined") {
+				if (!almostEqual(angles[i].yaw, angles[i + 1].yaw, config.parsing.aimbot.threshold)) {
+					if (is360Difference(angles[i].yaw, angles[i + 1].yaw)) {
 						continue;
 					}
 
-					data.curcasetempdata.aimbot_infractions.push({ prevAngle: lastFewAngles[i], nextAngle: lastFewAngles[i + 1], tick: demoFile.currentTick });
+					data.curcasetempdata.aimbot_infractions.push({ prevAngle: angles[i], nextAngle: angles[i + 1], tick: demoFile.currentTick });
 				}
 			}
 		}
