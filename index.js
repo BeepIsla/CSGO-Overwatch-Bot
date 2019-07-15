@@ -234,13 +234,13 @@ async function doOverwatchCase() {
 						let playerIndex = -1;
 						const demoFile = new demofile.DemoFile();
 
-						demoFile.gameEvents.on("player_connect", () => {
-							playerIndex = demoFile.players.map(p => p.steamId === "BOT" ? p.steamId : new SteamID(p.steamId).getSteamID64()).indexOf(sid.getSteamID64());
-						});
+						demoFile.gameEvents.on("player_connect", getPlayerIndex);
+						demoFile.gameEvents.on("player_disconnect", getPlayerIndex);
+						demoFile.gameEvents.on("round_freeze_end", getPlayerIndex);
 
-						demoFile.gameEvents.on("player_disconnect", () => {
+						function getPlayerIndex() {
 							playerIndex = demoFile.players.map(p => p.steamId === "BOT" ? p.steamId : new SteamID(p.steamId).getSteamID64()).indexOf(sid.getSteamID64());
-						});
+						}
 
 						demoFile.on("tickend", (curTick) => {
 							demoFile.emit("tickend__", { curTick: curTick, player: playerIndex });
