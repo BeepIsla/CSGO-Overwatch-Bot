@@ -111,4 +111,44 @@ module.exports = class Helper {
 			return false;
 		}
 	}
+
+	static deleteRecursive(dir) {
+		return new Promise((resolve, reject) => {
+			fs.readdir(dir, async (err, files) => {
+				if (err) {
+					reject(err);
+					return;
+				}
+
+				for (let file of files) {
+					let filePath = path.join(dir, file);
+					let stat = fs.statSync(filePath);
+
+					if (stat.isDirectory()) {
+						await this.deleteRecursive(filePath);
+					} else {
+						await new Promise((res, rej) => {
+							fs.unlink(filePath, (err) => {
+								if (err) {
+									rej(err);
+									return;
+								}
+
+								res();
+							});
+						});
+					}
+				}
+
+				fs.rmdir(dir, (err) => {
+					if (err) {
+						reject(err);
+						return;
+					}
+
+					resolve();
+				});
+			});
+		});
+	}
 }

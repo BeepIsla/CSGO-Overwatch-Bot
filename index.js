@@ -146,7 +146,7 @@ steamUser.on("loggedOn", async () => {
 });
 
 steamUser.on("error", (err) => {
-	if (csgoUser._GCHelloInterval) clearInterval(csgoUser._GCHelloInterval);
+	if (csgoUser && csgoUser._GCHelloInterval) clearInterval(csgoUser._GCHelloInterval);
 
 	console.error(err);
 });
