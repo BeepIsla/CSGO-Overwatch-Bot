@@ -9,7 +9,7 @@ const GameCoordinator = require("./GameCoordinator.js");
 module.exports = class Helper {
 	static GetLatestVersion() {
 		return new Promise((resolve, reject) => {
-			request("https://raw.githubusercontent.com/BeepFelix/CSGO-Overwatch-Bot/master/package.json", (err, res, body) => {
+			request("https://raw.githubusercontent.com/BeepIsla/CSGO-Overwatch-Bot/master/package.json", (err, res, body) => {
 				if (err) {
 					reject(err);
 					return;
