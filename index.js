@@ -345,6 +345,7 @@ async function doOverwatchCase() {
 							if(convictionObj.rpt_aimbot || convictionObj.rpt_wallhack || convictionObj.rpt_speedhack || convictionObj.rpt_teamharm) {
 								data.curcasetempdata.Reported = true;
 							} else {
+								data.curcasetempdata.Reported = false;
 							}
 
 							// Once we finished analysing the demo send the results
