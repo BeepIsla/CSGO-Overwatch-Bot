@@ -48,7 +48,8 @@ let data = {
 		wasAlreadyConvicted: false,
 		aimbot_infractions: [],
 		AFKing_infractions: [],
-		Wallhack_infractions: []
+		Wallhack_infractions: [],
+		Reported: false
 	}
 };
 
@@ -288,6 +289,15 @@ async function doOverwatchCase() {
 								reason: 3
 							};
 
+							if ((data.parsing.endTimestamp - data.parsing.startTimestamp) < (config.parsing.minimumTime * 1000)) {
+								// Wait this long before sending the request, if we parse the demo too fast the GC ignores us
+								let timer = parseInt((config.parsing.minimumTime * 1000) - (data.parsing.endTimestamp - data.parsing.startTimestamp)) / 1000;
+
+								console.log("Waiting " + timer + " second" + (timer === 1 ? "" : "s") + " to avoid the GC ignoring us");
+
+								await new Promise(r => setTimeout(r, (timer * 1000)));
+							}
+							
 							// Check the Steam Web API, if a token is provided, if the user is already banned, if so always send a conviction even if the bot didn't detect it
 							if (config.parsing.steamWebAPIKey && config.parsing.steamWebAPIKey.length >= 10) {
 								let banChecker = await new Promise((resolve, reject) => {
@@ -331,14 +341,10 @@ async function doOverwatchCase() {
 									data.curcasetempdata.wasAlreadyConvicted = false;
 								}
 							}
-
-							if ((data.parsing.endTimestamp - data.parsing.startTimestamp) < (config.parsing.minimumTime * 1000)) {
-								// Wait this long before sending the request, if we parse the demo too fast the GC ignores us
-								let timer = parseInt((config.parsing.minimumTime * 1000) - (data.parsing.endTimestamp - data.parsing.startTimestamp)) / 1000;
-
-								console.log("Waiting " + timer + " second" + (timer === 1 ? "" : "s") + " to avoid the GC ignoring us");
-
-								await new Promise(r => setTimeout(r, (timer * 1000)));
+							
+							if(convictionObj.rpt_aimbot || convictionObj.rpt_wallhack || convictionObj.rpt_speedhack || convictionObj.rpt_teamharm) {
+								data.curcasetempdata.Reported = true;
+							} else {
 							}
 
 							// Once we finished analysing the demo send the results
@@ -378,6 +384,8 @@ async function doOverwatchCase() {
 							console.log("	Wallhack: " + data.curcasetempdata.Wallhack_infractions.length);
 							console.log("	Other: 0");
 							console.log("	Griefing: " + data.curcasetempdata.AFKing_infractions.length);
+							console.log("	Reported: " +(data.curcasetempdata.Reported ? "Yes" : "No"));
+							console.log("	Already convicted: " +(data.curcasetempdata.wasAlreadyConvicted ? "Yes" : "No"));
 							console.log("Timings:");
 							console.log("	Total: " + parseInt((data.total.endTimestamp - data.total.startTimestamp) / 1000) + "s");
 							console.log("	Download: " + parseInt((data.download.endTimestamp - data.download.startTimestamp) / 1000) + "s");
