@@ -376,7 +376,9 @@ async function doOverwatchCase() {
 
 							data.total.endTimestamp = Date.now();
 							data.casesCompleted++;
-							data.suspectProfile = "https://steamcommunity.com/profiles/" + sid.getSteamID64() + "/";
+						     	if(data.curcasetempdata.Reported) {
+								data.suspectProfile = "https://steamcommunity.com/profiles/" + sid.getSteamID64() + "/"
+							}
 
 							// Print logs
 							console.log("Internal ID: " + data.casesCompleted);
