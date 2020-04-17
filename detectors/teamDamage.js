@@ -1,4 +1,5 @@
 module.exports = (demoFile, sid, data) => {
+    //TODO exclude motolov and Incendiary damge, "TROLL TEAM"
     demoFile.gameEvents.on("player_hurt", (event) => {
         const victim = demoFile.entities.getByUserId(event.userid);
         const attacker = demoFile.entities.getByUserId(event.attacker);
