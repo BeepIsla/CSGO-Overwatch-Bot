@@ -52,7 +52,8 @@ let data = {
 		Wallhack_infractions: [],
 		teamKill_infractions: [],
 		Reported: false
-	}
+	},
+	steamProfile: ""
 };
 
 let logonSettings = {
@@ -379,6 +380,7 @@ async function doOverwatchCase() {
 
 							data.total.endTimestamp = Date.now();
 							data.casesCompleted++;
+							data.curcasetempdata.steamProfile = "https://steamcommunity.com/profiles/"+ sid.getSteamID64() + "/";
 
 							// Print logs
 							console.log("Internal ID: " + data.casesCompleted);
