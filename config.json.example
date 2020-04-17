@@ -21,6 +21,7 @@
 		"maxVerdicts": 0,
 		"maxAimbot": 10,
 		"maxWallKills": 7,
+		"maxTeamKills": 1,
 		"maxAFKing": 3
 	},
 	"richPresence": {
