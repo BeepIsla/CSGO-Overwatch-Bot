@@ -8,6 +8,7 @@ const Aimbot = require("./detectors/aimbot.js");
 const AFKing = require("./detectors/AFKing.js");
 const Wallhack = require("./detectors/wallhack.js");
 const TeamKill = require("./detectors/teamkill.js");
+const TeamDamage = require("./detectors/teamDamage.js");
 
 const config = require("./config.json");
 
@@ -16,7 +17,8 @@ let data = {
 		aimbot_infractions: [],
 		AFKing_infractions: [],
 		Wallhack_infractions: [],
-		TeamKill_infractions: []
+		teamKill_infractions: [],
+		teamDamage_infractions: 0
 	}
 };
 
@@ -77,6 +79,8 @@ getResponse().then((result) => {
 		Aimbot(demoFile, sid, data, config);
 		AFKing(demoFile, sid, data, config);
 		Wallhack(demoFile, sid, data, config);
+		TeamKill(demoFile, sid, data);
+		TeamDamage(demoFile, sid, data);
 
 		demoFile.on("progress", (progressFraction) => {
 			let prog = Math.round(progressFraction * 100);
@@ -103,7 +107,8 @@ getResponse().then((result) => {
 			console.log("Infractions:");
 			console.log("	Aimbot: " + data.curcasetempdata.aimbot_infractions.length);
 			console.log("	Wallhack: " + data.curcasetempdata.Wallhack_infractions.length);
-			console.log("	TeamKills: "+ data.curcasetempdata.TeamKill_infractions.length);
+			console.log("	TeamKills: "+ data.curcasetempdata.teamKill_infractions.length);
+			console.log("	TeamDamage: " + data.curcasetempdata.teamDamage_infractions);
 			console.log("	Other: 0");
 			console.log("	Griefing: " + data.curcasetempdata.AFKing_infractions.length);
 		});
