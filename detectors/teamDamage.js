@@ -1,16 +1,14 @@
 module.exports = (demoFile, sid, data) => {
-    demoFile.gameEvents.on("player_death", (event) => {
+    //TODO exclude motolov and Incendiary damge, "TROLL TEAM"
+    demoFile.gameEvents.on("player_hurt", (event) => {
         const victim = demoFile.entities.getByUserId(event.userid);
         const attacker = demoFile.entities.getByUserId(event.attacker);
         if (!attacker || attacker.steam64Id === "BOT" || attacker.steam64Id !== sid.getSteamID64() || victim === attacker) {
             return;
         }
-        /**
-         * @returns Team number (0: Unassigned, 1: Spectator, 2: Terrorist, 3: Counter-Terrorist)
-         */
         if(attacker.teamNumber === victim.teamNumber){
-            data.curcasetempdata.teamKill_infractions.push(demoFile.currentTick);
-            //console.log("TK")
+            data.curcasetempdata.teamDamage_infractions += event.dmg_health;
+            //console.log(event.weapon);
         }
 
     })
