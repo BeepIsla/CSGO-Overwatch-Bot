@@ -46,6 +46,7 @@ You can forcefully parse a demo by simply putting it in the directory and runnin
 - - `maxVerdicts`: The maximum amount of cases we want to do. 0 for infinite
 - - `maxAimbot`: The maximum amount of infractions allowed before setting user as aimbotter
 - - `maxWallKills`: Maximum amount of allowed kills through a wall before setting user as wallhacking
+- - `maxTeamKills`: Maximum amount of allowed kills Team  
 - - `maxAFKing`: The maximum amount of infractions allowed before setting user as griefing
 - `richPresence`
 - - `steam_display`: What information to display on Steam - [Read more](#rich-presence)
