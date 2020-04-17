@@ -9,6 +9,7 @@ const SteamID = require("steamid");
 const Aimbot = require("./detectors/aimbot.js");
 const AFKing = require("./detectors/AFKing.js");
 const Wallhack = require("./detectors/wallhack.js");
+const TeamKill = require("./detectors/teamkill.js");
 
 const Helper = require("./helpers/Helper.js");
 const GameCoordinator = require("./helpers/GameCoordinator.js");
@@ -49,6 +50,7 @@ let data = {
 		aimbot_infractions: [],
 		AFKing_infractions: [],
 		Wallhack_infractions: [],
+		teamKill_infractions: [],
 		Reported: false
 	}
 };
@@ -229,6 +231,7 @@ async function doOverwatchCase() {
 						data.curcasetempdata.aimbot_infractions = [];
 						data.curcasetempdata.AFKing_infractions = [];
 						data.curcasetempdata.Wallhack_infractions = [];
+						data.curcasetempdata.teamKill_infractions = [];
 						data.curcasetempdata.wasAlreadyConvicted = false;
 
 						let lastProg = -1;
@@ -251,6 +254,7 @@ async function doOverwatchCase() {
 						Aimbot(demoFile, sid, data, config);
 						AFKing(demoFile, sid, data, config);
 						Wallhack(demoFile, sid, data, config);
+						TeamKill(demoFile, sid, data);
 
 						demoFile.on("progress", (progressFraction) => {
 							let prog = Math.round(progressFraction * 100);
@@ -285,7 +289,7 @@ async function doOverwatchCase() {
 								rpt_aimbot: (data.curcasetempdata.aimbot_infractions.length > config.verdict.maxAimbot) ? 1 : 0,
 								rpt_wallhack: (data.curcasetempdata.Wallhack_infractions.length > config.verdict.maxWallKills) ? 1 : 0, // TODO: Add detection for looking at enemies through walls
 								rpt_speedhack: 0, // TODO: Add detection for other cheats (Ex BunnyHopping)
-								rpt_teamharm: (data.curcasetempdata.AFKing_infractions.length > config.verdict.maxAFKing) ? 1 : 0, // TODO: Add detection for damaging teammates
+								rpt_teamharm: (data.curcasetempdata.AFKing_infractions.length > config.verdict.maxAFKing || data.curcasetempdata.teamKill_infractions.length > config.verdict.maxTeamKills) ? 1 : 0, // TODO: Add detection for damaging teammates
 								reason: 3
 							};
 
@@ -383,6 +387,7 @@ async function doOverwatchCase() {
 							console.log("Infractions:");
 							console.log("	Aimbot: " + data.curcasetempdata.aimbot_infractions.length);
 							console.log("	Wallhack: " + data.curcasetempdata.Wallhack_infractions.length);
+							console.log("	TeamKills: " + data.curcasetempdata.teamKill_infractions.length);
 							console.log("	Other: 0");
 							console.log("	Griefing: " + data.curcasetempdata.AFKing_infractions.length);
 							console.log("	Reported: " +(data.curcasetempdata.Reported ? "Yes" : "No"));
