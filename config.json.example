@@ -22,6 +22,7 @@
 		"maxAimbot": 10,
 		"maxWallKills": 7,
 		"maxTeamKills": 1,
+		"maxTeamDamage" 180,
 		"maxAFKing": 3
 	},
 	"richPresence": {
