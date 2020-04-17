@@ -16,7 +16,7 @@ let data = {
 		aimbot_infractions: [],
 		AFKing_infractions: [],
 		Wallhack_infractions: [],
-		TeamKill_infractions: []
+		teamKill_infractions: []
 	}
 };
 
@@ -103,7 +103,7 @@ getResponse().then((result) => {
 			console.log("Infractions:");
 			console.log("	Aimbot: " + data.curcasetempdata.aimbot_infractions.length);
 			console.log("	Wallhack: " + data.curcasetempdata.Wallhack_infractions.length);
-			console.log("	TeamKills: "+ data.curcasetempdata.TeamKill_infractions.length);
+			console.log("	TeamKills: "+ data.curcasetempdata.teamKill_infractions.length);
 			console.log("	Other: 0");
 			console.log("	Griefing: " + data.curcasetempdata.AFKing_infractions.length);
 		});
