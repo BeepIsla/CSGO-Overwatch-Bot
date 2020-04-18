@@ -5,10 +5,10 @@ module.exports = (demoFile, sid, data) => {
         if (!attacker || attacker.steam64Id === "BOT" || attacker.steam64Id !== sid.getSteamID64() || victim === attacker) {
             return;
         }
-        /**
-         * @returns Team number (0: Unassigned, 1: Spectator, 2: Terrorist, 3: Counter-Terrorist)
-         */
-        if(attacker.teamNumber === victim.teamNumber){
+        isNotMolotovInc = (event) => {
+            return event.weapon != "incgrenade" && event.weapon != "molotov";
+        }
+        if(attacker.teamNumber === victim.teamNumber && isNotMolotovInc(event)){
             data.curcasetempdata.teamKill_infractions.push(demoFile.currentTick);
             //console.log("TK")
         }
