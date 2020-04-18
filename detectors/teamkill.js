@@ -6,7 +6,7 @@ module.exports = (demoFile, sid, data) => {
             return;
         }
         isNotMolotovInc = (event) => {
-            return event.weapon != "incgrenade" || event.weapon != "molotov";
+            return event.weapon != "incgrenade" && event.weapon != "molotov";
         }
         if(attacker.teamNumber === victim.teamNumber && isNotMolotovInc(event)){
             data.curcasetempdata.teamKill_infractions.push(demoFile.currentTick);
