@@ -68,7 +68,7 @@ getResponse().then((result) => {
 		demoFile.gameEvents.on("round_freeze_end", getPlayerIndex);
 
 		function getPlayerIndex() {
-			playerIndex = demoFile.players.map(p => p.steamId === "BOT" ? p.steamId : new SteamID(p.steamId).getSteamID64()).indexOf(sid.getSteamID64());
+			playerIndex = demoFile.players.filter(p => p.userInfo !== null).map(p => p.steamId === "BOT" ? p.steamId : new SteamID(p.steamId).getSteamID64()).indexOf(sid.getSteamID64());
 		}
 
 		demoFile.on("tickend", (curTick) => {
