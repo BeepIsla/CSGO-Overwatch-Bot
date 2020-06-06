@@ -15,7 +15,7 @@ You can forcefully parse a demo by simply putting it in the directory and runnin
 5. Make a duplicate of the `config.json.example` and remove the `.example`
 6. Adjust your now called `config.json` - [See Config](#config)
 7. Run `node index.js`
-8. After every update repeat from step 3 onwards to ensure everything required is up to date
+8. After every update repeat from step 2 onwards to ensure everything required is up to date
 
 # Detections
 
