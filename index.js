@@ -222,7 +222,9 @@ async function doOverwatchCase() {
 				fs.createReadStream("./demofile.bz2").pipe(bz2()).pipe(fs.createWriteStream("./demofile.dem")).on("close", () => {
 					data.unpacking.endTimestamp = Date.now();
 
-					fs.unlinkSync("./demofile.bz2");
+					if (fs.existsSync("./demofile.bz2")) {
+						fs.unlinkSync("./demofile.bz2");
+					}
 
 					data.parsing.startTimestamp = Date.now();
 
