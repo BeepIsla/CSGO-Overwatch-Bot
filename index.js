@@ -55,7 +55,8 @@ let data = {
 		teamDamage_infractions: 0,
 		Reported: false
 	},
-	steamProfile: ""
+	steamProfile: "",
+	steamProfileUrl: 0
 };
 
 let logonSettings = {
@@ -388,6 +389,7 @@ async function doOverwatchCase() {
 							data.total.endTimestamp = Date.now();
 							data.casesCompleted++;
 							data.curcasetempdata.steamProfile = "https://steamcommunity.com/profiles/"+ sid.getSteamID64() + "/";
+							data.curcasetempdata.steamProfileUrl = "[InternetShortcut]\nURL=https://steamcommunity.com/profiles/"+ sid.getSteamID64();
 
 							// Print logs
 							console.log("Internal ID: " + data.casesCompleted);
@@ -421,6 +423,7 @@ async function doOverwatchCase() {
 								// Write case file
 								fs.writeFileSync("./cases/" + caseUpdate2.caseid + "/message.json", JSON.stringify(data.curcasetempdata.owMsg, null, 4));
 								fs.writeFileSync("./cases/" + caseUpdate2.caseid + "/data.json", JSON.stringify(data, null, 4));
+								fs.writeFileSync("./cases/" + caseUpdate2.caseid + "/profile.url", data.curcasetempdata.steamProfileUrl);
 							}
 
 							if (config.verdict.backupDemo) {
