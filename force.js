@@ -124,6 +124,11 @@ function getResponse() {
 				suspect: "76561198976843261"
 			});
 		});
+	} else if (args[2] && args[3]) {
+		return Promise.resolve({
+			path: args[2],
+			suspect: args[3]
+		});
 	} else {
 		return inquire.prompt([
 			{
