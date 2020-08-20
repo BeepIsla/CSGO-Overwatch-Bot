@@ -117,6 +117,8 @@ getResponse().then((result) => {
 
 // Stuff for easier debugging in Visual Studio Code
 function getResponse() {
+	const args = process.argv; 
+
 	if (isDebugging() === true) {
 		return new Promise((resolve, reject) => {
 			resolve({
