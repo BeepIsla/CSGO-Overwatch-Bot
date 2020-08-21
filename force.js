@@ -41,12 +41,12 @@ getResponse().then((result) => {
 		return;
 	}
 
-	let sid = undefined;
+	let sid;
 	try {
 		sid = new SteamID(result.suspect.trim());
 	} catch (e) { };
 
-	if (sid === undefined || sid.isValid() === false) {
+	if (!sid || !sid.isValid()) {
 		console.log("Invalid SteamID entered");
 		return;
 	}
@@ -119,7 +119,7 @@ getResponse().then((result) => {
 function getResponse() {
 	const args = process.argv; 
 
-	if (isDebugging() === true) {
+	if (isDebugging()) {
 		return new Promise((resolve, reject) => {
 			resolve({
 				path: "rage.dem",
