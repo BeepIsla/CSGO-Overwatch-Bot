@@ -71,6 +71,7 @@ getResponse().then((result) => {
 		function getPlayerIndex() {
 			const filtered = demoFile.players.filter(p => p.userInfo !== null);
 			playerIndex = filtered.map(p => p.steamId === "BOT" ? p.steamId : new SteamID(p.steamId).getSteamID64()).indexOf(sid.getSteamID64());
+			if (suspectIsExist) return;
 			suspectIsExist = filtered.find(p => p.steam64Id === sid.getSteamID64()) ? true : false // Check if suspect is exist on this tick of demo
 		}
 
