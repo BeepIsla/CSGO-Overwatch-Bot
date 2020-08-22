@@ -67,8 +67,11 @@ getResponse().then((result) => {
 		demoFile.gameEvents.on("player_disconnect", getPlayerIndex);
 		demoFile.gameEvents.on("round_freeze_end", getPlayerIndex);
 
+		let suspectIsExist;
 		function getPlayerIndex() {
-			playerIndex = demoFile.players.filter(p => p.userInfo !== null).map(p => p.steamId === "BOT" ? p.steamId : new SteamID(p.steamId).getSteamID64()).indexOf(sid.getSteamID64());
+			const filtered = demoFile.players.filter(p => p.userInfo !== null);
+			playerIndex = filtered.map(p => p.steamId === "BOT" ? p.steamId : new SteamID(p.steamId).getSteamID64()).indexOf(sid.getSteamID64());
+			suspectIsExist = filtered.find(p => p.steam64Id === sid.getSteamID64()) ? true : false // Check if suspect is exist on this tick of demo
 		}
 
 		demoFile.on("tickend", (curTick) => {
@@ -103,11 +106,13 @@ getResponse().then((result) => {
 				console.error(err);
 			}
 
+			if (!suspectIsExist) return console.error("Suspect: " + (sid ? sid.getSteamID64() : 0), "is not exist in current demo");
+
 			console.log("Suspect: " + (sid ? sid.getSteamID64() : 0));
 			console.log("Infractions:");
 			console.log("	Aimbot: " + data.curcasetempdata.aimbot_infractions.length);
 			console.log("	Wallhack: " + data.curcasetempdata.Wallhack_infractions.length);
-			console.log("	TeamKills: "+ data.curcasetempdata.teamKill_infractions.length);
+			console.log("	TeamKills: " + data.curcasetempdata.teamKill_infractions.length);
 			console.log("	TeamDamage: " + data.curcasetempdata.teamDamage_infractions);
 			console.log("	Other: 0");
 			console.log("	Griefing: " + data.curcasetempdata.AFKing_infractions.length);
@@ -117,7 +122,7 @@ getResponse().then((result) => {
 
 // Stuff for easier debugging in Visual Studio Code
 function getResponse() {
-	const args = process.argv; 
+	const args = process.argv;
 
 	if (isDebugging()) {
 		return new Promise((resolve, reject) => {
