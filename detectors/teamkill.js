@@ -8,7 +8,7 @@ module.exports = (demoFile, sid, data) => {
         if (!victim || !attacker || attacker.steam64Id === "BOT" || attacker.steam64Id !== sid.getSteamID64() || victim === attacker) {
             return;
         }
-        if(attacker.teamNumber === victim.teamNumber && isNotMolotovInc(event)){
+        if(attacker.isFriendly(victim) && isNotMolotovInc(event)){
             data.curcasetempdata.teamKill_infractions.push(demoFile.currentTick);
         }
 
