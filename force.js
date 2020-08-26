@@ -9,6 +9,7 @@ const AFKing = require("./detectors/AFKing.js");
 const Wallhack = require("./detectors/wallhack.js");
 const TeamKill = require("./detectors/teamkill.js");
 const TeamDamage = require("./detectors/teamDamage.js");
+const AA = require("./detectors/AA.js");
 
 const config = require("./config.json");
 
@@ -18,7 +19,8 @@ let data = {
 		AFKing_infractions: [],
 		Wallhack_infractions: [],
 		teamKill_infractions: [],
-		teamDamage_infractions: 0
+		teamDamage_infractions: 0,
+                AA_infractions: []
 	}
 };
 
@@ -81,6 +83,7 @@ getResponse().then((result) => {
 		Wallhack(demoFile, sid, data, config);
 		TeamKill(demoFile, sid, data);
 		TeamDamage(demoFile, sid, data);
+                AA(demoFile, sid, data); // todo: remove sid
 
 		demoFile.on("progress", (progressFraction) => {
 			let prog = Math.round(progressFraction * 100);
@@ -106,6 +109,7 @@ getResponse().then((result) => {
 			console.log("Suspect: " + (sid ? sid.getSteamID64() : 0));
 			console.log("Infractions:");
 			console.log("	Aimbot: " + data.curcasetempdata.aimbot_infractions.length);
+                        console.log("	AA: " + data.curcasetempdata.AA_infractions.length); // ! Unstable
 			console.log("	Wallhack: " + data.curcasetempdata.Wallhack_infractions.length);
 			console.log("	TeamKills: "+ data.curcasetempdata.teamKill_infractions.length);
 			console.log("	TeamDamage: " + data.curcasetempdata.teamDamage_infractions);
