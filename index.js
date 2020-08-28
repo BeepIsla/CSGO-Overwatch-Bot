@@ -16,12 +16,7 @@ const steam = new SteamUser({
 	autoRelogin: false // Do not automatically log back in - Process must exit and an external program like PM2 must auto restart
 });
 const coordinator = new Coordinator(steam, 730);
-const protobufs = new Protobufs([
-	{
-		name: "csgo",
-		protos: path.join(__dirname, "protobufs", "csgo")
-	}
-]);
+let protobufs = undefined;
 let casesCompleted = 0;
 let timings = {
 	Downloading: 0,
@@ -38,6 +33,13 @@ let timings = {
 		console.log("Failed to find protobufs, downloading and extracting...");
 		await Helper.DownloadProtobufs(__dirname);
 	}
+
+	protobufs = new Protobufs([
+		{
+			name: "csgo",
+			protos: path.join(__dirname, "protobufs", "csgo")
+		}
+	]);
 
 	console.log("Checking for updates...");
 	try {
