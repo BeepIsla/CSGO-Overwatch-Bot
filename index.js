@@ -427,7 +427,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		// Wait this long before requesting a new case
 		let delay = body.throttleseconds || 10;
 		console.log("Waiting " + delay + " seconds before requesting a new case...");
-		await new Promise(p => setTimeout(delay * 1000));
+		await new Promise(p => setTimeout(p, delay * 1000));
 
 		console.log("Attempt to get Overwatch case...");
 		await coordinator.sendMessage(
