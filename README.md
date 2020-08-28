@@ -8,6 +8,10 @@ You can forcefully parse a demo by running `node force.js`, it will ask you for 
 
 This script **does not** even initialize VAC, you cannot be VAC banned for a cheat detection using this. You **can** however get manually banned or even suspended from Steam entirely for using this. Valve does **not** want you to automate Overwatch cases. Use this at your own risk. I am not responsible for any bans, damages, lost items or anything else. You have been warned.
 
+## Dependences
+
+NodeJS 12+ version
+
 ## Installation
 
 1. Install [NodeJS](https://nodejs.org/)
