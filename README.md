@@ -34,7 +34,7 @@ You can forcefully parse a demo by running `node force.js`, it will ask you for 
   - `Wallhack`: Enable/Disable wallhack detector
   - `Griefing`: Enable/Disable griefing detector
   - `AFKing`: Enable/Disable afking detector
-  - `AntiAim`: Enable/Disable anti-aim detector
+  - `AntiAim`: Enable/Disable anti-aim detector (By @BlackYuzia)
 - `verdict`
   - `writeLog`: Should we write our logs to a folder called `cases/<CaseID>`?
   - `backupDemo`: Should we backup the Overwatch demo in a folder called `cases/<CaseID>`?
