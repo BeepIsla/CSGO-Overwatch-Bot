@@ -1,167 +1,185 @@
-const request = require("request");
-const vdf = require("vdf");
-const SteamUser = require("steam-user");
 const path = require("path");
 const fs = require("fs");
+const URL = require("url");
+const fetch = require("node-fetch");
 const unzipper = require("unzipper");
-const GameCoordinator = require("./GameCoordinator.js");
+const cheerio = require("cheerio");
+const Protobufs = require("./Protobufs.js");
+const BAN_REGEX = /(?<days>\d+)\s+day\(s\)\s+since\s+last\s+ban/;
 
 module.exports = class Helper {
-	static GetLatestVersion() {
-		return new Promise((resolve, reject) => {
-			request("https://raw.githubusercontent.com/BeepIsla/CSGO-Overwatch-Bot/master/package.json", (err, res, body) => {
-				if (err) {
-					reject(err);
-					return;
-				}
-	
-				let json = undefined;
-				try {
-					json = JSON.parse(body);
-				} catch(e) {};
-	
-				if (json === undefined) {
-					reject(body);
-					return;
-				}
-	
-				if (typeof json.version !== "string") {
-					reject(json);
-					return;
-				}
-	
-				resolve(json.version);
-			});
-		});
+	static OverwatchConstants = {
+		// Via leaked CSGO Source Code
+		// Online repository: https://github.com/perilouswithadollarsign/cstrike15_src/blob/29e4c1fda9698d5cebcdaf1a0de4b829fa149bf8/game/shared/cstrike15/cstrike15_gcconstants.h#L505
+
+		EMMV2OverwatchCasesVerdict_t: {
+			// CSGO V2 Overwatch case verdict field, stored in SQL
+			k_EMMV2OverwatchCasesVerdict_Pending: 0,
+			k_EMMV2OverwatchCasesVerdict_Dismissed: 1,
+			k_EMMV2OverwatchCasesVerdict_ConvictedForCheating: 2,
+			k_EMMV2OverwatchCasesVerdict_ConvictedForBehavior: 3
+		},
+		EMMV2OverwatchCasesUpdateReason_t: {
+			// CSGO V2 Overwatch case update request reason, used for communication between client and GC
+			k_EMMV2OverwatchCasesUpdateReason_Poll: 0,		// Client is polling for an overwatch case
+			k_EMMV2OverwatchCasesUpdateReason_Assign: 1,	// Client is eager to get a case assigned and work on it
+			k_EMMV2OverwatchCasesUpdateReason_Downloading: 2,	// Client is downloading the case files
+			k_EMMV2OverwatchCasesUpdateReason_Verdict: 3	// Client is willing to cast a verdict on a previously assigned case
+		},
+		EMMV2OverwatchCasesStatus_t: {
+			// CSGO V2 Overwatch case status field, stored in SQL
+			k_EMMV2OverwatchCasesStatus_Default: 0,
+			k_EMMV2OverwatchCasesStatus_Ready: 1,
+			k_EMMV2OverwatchCasesStatus_ErrorDownloading: 2,
+			k_EMMV2OverwatchCasesStatus_ErrorExtracting: 3
+		},
+		EMMV2OverwatchCasesType_t: {
+			// CSGO V2 Overwatch case type field, stored in SQL
+			k_EMMV2OverwatchCasesType_Reports: 0,
+			k_EMMV2OverwatchCasesType_Placebo: 1,
+			k_EMMV2OverwatchCasesType_VACSuspicion: 2,
+			k_EMMV2OverwatchCasesType_Manual: 3,
+			k_EMMV2OverwatchCasesType_MLSuspicion: 4,
+			k_EMMV2OverwatchCasesType_Max: 5
+		}
+	};
+
+	static ParseURL(baseURL, query) {
+		let url = new URL.URL(baseURL);
+		for (let key in (query || {})) {
+			url.searchParams.append(key, String(query[key]));
+		}
+		return url.href;
 	}
 
-	static DownloadLanguage(lang = "csgo_english.txt") {
-		return new Promise((resolve, reject) => {
-			if (lang.startsWith("csgo_") === false) {
-				lang = "csgo_" + lang;
+	static Fetch(baseURL, query = {}) {
+		let href = this.ParseURL(baseURL, query);
+		return fetch(href);
+	}
+
+	static async GetLatestVersion() {
+		let response = await this.Fetch("https://github.com/BeepIsla/CSGO-Overwatch-Bot/blob/master/package.json?raw=true");
+		let json = await response.json();
+		return json.version;
+	}
+
+	static async GetSteamAPI(interf, method, version, params) {
+		let response = await this.Fetch("https://api.steampowered.com/" + interf + "/" + method + "/" + version, params);
+		let json = await response.json();
+		return json.response;
+	}
+
+	static async DownloadProtobufs(dir) {
+		await Promise.all([
+			"Protobufs-master",
+			"protobufs"
+		].map(async (folder) => {
+			let p = path.join(dir, folder);
+			if (!fs.existsSync(p)) {
+				return;
 			}
 
-			if (lang.endsWith(".txt") === false) {
-				lang = lang + ".txt";
-			}
+			return this.DeleteRecursive(p);
+		}));
 
-			request("https://raw.githubusercontent.com/SteamDatabase/GameTracking-CSGO/master/csgo/resource/" + lang, (err, res, body) => {
-				if (err) {
-					reject(err);
-					return;
-				}
+		let newProDir = path.join(dir, "Protobufs-master");
+		let proDir = path.join(dir, "protobufs");
 
-				if (res.statusCode !== 200) {
-					reject(new Error("Invalid Status Code: " + res.statusCode));
-					return;
-				}
+		// Yes I know the ones I download here are technically not the same as the ones in the submodule
+		// but that doesn't really matter, I doubt Valve will do any major changes with the protobufs I use here anyways
+		let body = await this.Fetch("https://github.com/SteamDatabase/Protobufs/archive/master.zip");
+		let buffer = await body.buffer();
 
-				let obj = undefined;
-				try {
-					obj = vdf.parse(body);
-				} catch(e) {};
-
-				if (obj === undefined) {
-					reject(body);
-					return;
-				}
-
-				resolve(obj);
-			});
+		let zip = await unzipper.Open.buffer(buffer);
+		await zip.extract({
+			path: dir
 		});
+
+		await fs.rename(newProDir, proDir);
 	}
 
-	static downloadProtobufs(dir) {
-		return new Promise(async (resolve, reject) => {
-			let deletes = ["Protobufs-master", "protobufs"];
-			await Promise.all(deletes.map(d => {
-				let p = path.join(dir, d);
-				if (fs.existsSync(p)) {
-					return this.deleteRecursive(p);
-				} else {
-					return new Promise(r => r());
-				}
-			}));
-
-			let newProDir = path.join(dir, "Protobufs-master");
-			let proDir = path.join(dir, "protobufs");
-
-			// Yes I know the ones I download here are technically not the same as the ones in the submodule
-			// but that doesn't really matter, I doubt Valve will do any major changes with the protobufs I use here anyways
-			request({
-				uri: "https://github.com/SteamDatabase/Protobufs/archive/master.zip",
-				encoding: null
-			}, async (err, res, body) => {
-				if (err) {
-					reject(err);
-					return;
-				}
-
-				let zip = await unzipper.Open.buffer(body);
-				await zip.extract({
-					path: dir
-				});
-
-				fs.rename(newProDir, proDir, (err) => {
-					if (err) {
-						reject(err);
-						return;
-					}
-
-					resolve();
-				});
-			});
-		});
-	}
-
-	static verifyProtobufs() {
-		let user = new SteamUser();
-		let gc = new GameCoordinator(user);
-
+	static VerifyProtobufs() {
 		try {
-			return typeof gc.Protos.csgo.EGCBaseClientMsg.k_EMsgGCClientHello === "number";
-		} catch (e) {
+			// Not a full verification, constructors are all missing but whatever
+			let protobufs = new Protobufs([
+				{
+					name: "csgo",
+					protos: [
+						path.join(__dirname, "..", "protobufs", "csgo", "cstrike15_gcmessages.proto"),
+						path.join(__dirname, "..", "protobufs", "csgo", "econ_gcmessages.proto"),
+						path.join(__dirname, "..", "protobufs", "csgo", "gcsystemmsgs.proto")
+					]
+				}
+			]);
+			let verification = {
+				"csgo": {
+					"ECsgoGCMsg": [
+						"k_EMsgGCCStrike15_v2_MatchmakingClient2GCHello",
+						"k_EMsgGCCStrike15_v2_MatchmakingGC2ClientHello",
+						"k_EMsgGCCStrike15_v2_ClientGCRankUpdate",
+						"k_EMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate",
+						"k_EMsgGCCStrike15_v2_PlayerOverwatchCaseAssignment"
+					],
+					"EGCBaseClientMsg": [
+						"k_EMsgGCClientHello",
+						"k_EMsgGCClientWelcome"
+					]
+				}
+			};
+
+			for (let game in verification) {
+				for (let type in verification[game]) {
+					for (let msg of verification[game][type]) {
+						if (typeof protobufs.data[game][type][msg] === "number") {
+							continue;
+						}
+
+						return false;
+					}
+				}
+			}
+
+			return true;
+		} catch {
 			return false;
 		}
 	}
 
-	static deleteRecursive(dir) {
-		return new Promise((resolve, reject) => {
-			fs.readdir(dir, async (err, files) => {
-				if (err) {
-					reject(err);
-					return;
-				}
+	static async DeleteRecursive(dir) {
+		let files = await fs.readdir(dir);
 
-				for (let file of files) {
-					let filePath = path.join(dir, file);
-					let stat = fs.statSync(filePath);
+		for (let file of files) {
+			let filePath = path.join(dir, file);
+			let stat = await fs.stat(filePath);
 
-					if (stat.isDirectory()) {
-						await this.deleteRecursive(filePath);
-					} else {
-						await new Promise((res, rej) => {
-							fs.unlink(filePath, (err) => {
-								if (err) {
-									rej(err);
-									return;
-								}
+			if (stat.isDirectory()) {
+				await this.DeleteRecursive(filePath);
+			} else {
+				await fs.unlink(filePath);
+			}
+		}
 
-								res();
-							});
-						});
-					}
-				}
-
-				fs.rmdir(dir, (err) => {
-					if (err) {
-						reject(err);
-						return;
-					}
-
-					resolve();
-				});
-			});
-		});
+		await fs.rmdir(dir);
 	}
-}
+
+	static ShiftNumber(index) {
+		index = index.toString();
+		while (index.length < 3) {
+			index = "0" + index;
+		}
+		return index;
+	}
+
+	static async GetBanStatus(sid) {
+		let response = await this.Fetch("https://steamcommunity.com/profiles/" + sid.getSteamID64());
+		let text = await response.text();
+		let $ = cheerio.load(text);
+		let banText = $(".profile_ban_status").remove(".profile_ban").text().trim();
+		let match = banText.match(BAN_REGEX);
+		if (!match) {
+			return undefined;
+		}
+
+		return Number(match.groups.days);
+	}
+};
