@@ -95,7 +95,7 @@ module.exports = class Helper {
 			path: dir
 		});
 
-		await fs.rename(newProDir, proDir);
+		await fs.promises.rename(newProDir, proDir);
 	}
 
 	static VerifyProtobufs() {
