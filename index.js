@@ -351,7 +351,10 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 			fs.writeFileSync("cases/" + body.caseid + "/data.json", JSON.stringify(data, null, "\t"));
 		}
 
-		// Log verdict
+		// Demo logs
+		if (config.verdict.printScoreboard) {
+			demo.logScoreboard();
+		}
 		demo.logResults();
 
 		// Log timings

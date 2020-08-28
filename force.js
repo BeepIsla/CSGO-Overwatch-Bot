@@ -88,6 +88,9 @@ new Promise((resolve, reject) => {
 		process.stdout.write("Parsing: 0%");
 		demo.parse().then((data) => {
 			process.stdout.write("\n");
+			if (config.verdict.printScoreboard) {
+				demo.logScoreboard();
+			}
 			demo.logResults();
 
 			if (result.outpath) {

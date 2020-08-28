@@ -17,6 +17,8 @@
     "almost-equal": "^1.1.0",
     "bytebuffer": "^5.0.1",
     "cheerio": "^1.0.0-rc.3",
+    "cli-table3": "^0.6.0",
+    "colors": "^1.4.0",
     "demofile": "^1.5.0",
     "inquirer": "^7.3.3",
     "node-fetch": "^2.6.0",

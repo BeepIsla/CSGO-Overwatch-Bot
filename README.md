@@ -38,6 +38,7 @@ You can forcefully parse a demo by running `node force.js`, it will ask you for 
 - `verdict`
   - `writeLog`: Should we write our logs to a folder called `cases/<CaseID>`?
   - `backupDemo`: Should we backup the Overwatch demo in a folder called `cases/<CaseID>`?
+  - `printScoreboard`: Should we print a scoreboard with player statistics to console?
   - `maxVerdicts`: Maximum amount of Overwatch cases to do before stopping. `0` for unlimited.
 
   - `minAimbot`: Minimum amount of aimbot infractions required to convict for aimbotting

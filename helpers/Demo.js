@@ -1,11 +1,34 @@
 const fs = require("fs");
 const path = require("path");
 const demofile = require("demofile");
+const CliTable = require("cli-table3");
+const colors = require("colors");
 const Helper = require("./Helper.js");
 const modes = [
 	undefined,
 	"competitive",
 	"scrimcomp2v2"
+];
+const playerStats = [
+	"assists",
+	"deaths",
+	"kills",
+	"mvps",
+	"name",
+	"score",
+	"teamNumber"
+];
+const teams = {
+	NONE: 0,
+	SPECTATOR: 1,
+	TERRORIST: 2,
+	COUNTERTERRORIST: 3
+};
+const teamName = [
+	"None",
+	"Spectator",
+	"Terrorists",
+	"Counter-Terrorists"
 ];
 
 const detectors = fs.readdirSync(path.join(__dirname, "..", "detectors")).filter((file) => {
@@ -37,6 +60,7 @@ module.exports = class Demo {
 			}
 		};
 		this.detectors = [];
+		this.players = {};
 
 		this.demo = new demofile.DemoFile();
 	}
@@ -60,6 +84,64 @@ module.exports = class Demo {
 		console.log("\t- Wallhack: " + (this.obj.verdict.wallhack ? "✔️" : "❌"));
 		console.log("\t-    Other: " + (this.obj.verdict.speedhack ? "✔️" : "❌"));
 		console.log("\t- Griefing: " + (this.obj.verdict.teamharm ? "✔️" : "❌"));
+	}
+
+	logScoreboard() {
+		let teams = Object.keys(this.players).reduce((prev, cur) => {
+			prev[this.players[cur].teamNumber].push({
+				...this.players[cur],
+				steamID64: cur
+			});
+
+			prev[this.players[cur].teamNumber] = prev[this.players[cur].teamNumber].sort((a, b) => {
+				return b.score - a.score;
+			});
+
+			return prev;
+		}, [
+			[], // None
+			[], // Spectator
+			[], // Terrorist
+			[] // Counter-Terrorist
+		]);
+
+		let table = new CliTable({
+			head: [
+				"SteamID",
+				"Name",
+				"Kills",
+				"Assists",
+				"Deaths",
+				"MVPs",
+				"Score",
+				"Team"
+			]
+		});
+
+		// CTs at top - Ts at bottom
+		// CT is higher number than T so go reverse
+		for (let i = 3; i >= 2; i--) {
+			for (let player of teams[i]) {
+				table.push([
+					player.steamID64,
+					player.name,
+					player.kills,
+					player.assists,
+					player.deaths,
+					player.mvps,
+					player.score,
+					teamName[player.teamNumber]
+				].map((text) => {
+					if (player.steamID64 === this.suspect64Id) {
+						return colors.yellow(text);
+					}
+
+					return text;
+				}));
+			}
+		}
+
+		console.log(table.toString());
 	}
 
 	parse(steam = undefined) {
@@ -88,6 +170,8 @@ module.exports = class Demo {
 					"game:map": this.obj.map
 				});
 			});
+
+			this.demo.gameEvents.on("round_officially_ended", this.updateScoreboard.bind(this));
 
 			// Parse suspect information
 			this.demo.gameEvents.on("player_disconnect", this.findSuspect.bind(this));
@@ -222,5 +306,45 @@ module.exports = class Demo {
 		}
 
 		this.suspectPlayer.arrayIndex = Helper.ShiftNumber(this.suspectPlayer.index);
+	}
+
+	updateScoreboard() {
+		// If this is half time swap all existing players "teamNumber"
+		let mp_maxrounds = Number(this.demo.conVars.vars.get("mp_maxrounds"));
+		if (this.demo.gameRules.roundsPlayed === (mp_maxrounds / 2)) {
+			// While the "Update all players" below resets this due to you still being on your
+			// old team during the 15 seconds of halftime we have to do this for disconnected players
+			// If you disconnect round 12 and don't reconnect it would never update your "teamNumber" again
+			for (let key in this.players) {
+				switch (this.players[key].teamNumber) {
+					case teams.COUNTERTERRORIST: {
+						this.players[key].teamNumber = teams.TERRORIST;
+						break;
+					}
+					case teams.TERRORIST: {
+						this.players[key].teamNumber = teams.COUNTERTERRORIST;
+						break;
+					}
+					default: {
+						break;
+					}
+				}
+			}
+		}
+
+		// Update all players
+		for (let player of this.demo.players) {
+			if (player.isFakePlayer) {
+				continue;
+			}
+
+			if (!this.players[player.steam64Id]) {
+				this.players[player.steam64Id] = {};
+			}
+
+			for (let key of playerStats) {
+				this.players[player.steam64Id][key] = player[key];
+			}
+		}
 	}
 };
