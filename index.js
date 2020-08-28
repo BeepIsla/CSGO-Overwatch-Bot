@@ -292,7 +292,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 			].join("\n"));
 		}
 
-		let demo = new Demo(demoBuffer, sid, config);
+		let demo = new Demo(demoBuffer, sid.getSteamID64(), config);
 		let lastVal = 0;
 		demo.demo.on("progress", (progressFraction) => {
 			let percentage = Math.round(progressFraction * 100);
