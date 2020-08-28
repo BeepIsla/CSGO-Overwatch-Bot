@@ -1,20 +1,18 @@
-const almostEqual = require("almost-equal");
-
 // This class name MUST be unique or it will override other results
-module.exports = class AFKing {
+module.exports = class AntiAim {
 	constructor(parent, config) {
 		this.parent = parent; // This is the object from "Demo.js"
 		this.config = config;
 
 		// Variables
 		this.infractions = [];
-		this.startPosition = undefined;
-		this.roundPosition = [];
+		this.isActiveRound = false;
 
 		// Register events
 		this.parent.demo.on("tickend", this.OnTickEnd.bind(this));
 		this.parent.demo.gameEvents.on("round_freeze_end", this.OnRoundFreezeEnd.bind(this));
 		this.parent.demo.gameEvents.on("round_end", this.OnRoundEnd.bind(this));
+		this.parent.demo.gameEvents.on("round_start", this.OnRoundEnd.bind(this)); // Does the same as above, no need for 2 event handlers doing the same thing
 	}
 
 	result() {
@@ -31,8 +29,8 @@ module.exports = class AFKing {
 		return {
 			aimbot: false,
 			wallhack: false,
-			speedhack: false,
-			teamharm: this.infractions.length >= this.config.verdict.minAFKing
+			speedhack: this.infractions.length >= this.config.verdict.minAntiAim,
+			teamharm: false
 		};
 	}
 
@@ -48,57 +46,38 @@ module.exports = class AFKing {
 	 * Custom Methods *
 	 ******************/
 	OnTickEnd(tick) {
-		if (!this.parent.suspectPlayer) {
-			// Suspect left
-			this.roundPosition = [];
+		if (!this.parent.suspectPlayer || !this.parent.suspectPlayer.isAlive || !this.isActiveRound ||
+			this.parent.demo.gameRules.getProp("DT_CSGameRules", "m_bWarmupPeriod")
+		) {
+			// Suspect left, is dead, round is not active or in warmup
 			return;
 		}
 
-		if (!this.parent.suspectPlayer.isAlive) {
-			// Spectating players change their position based on who they are spectating
+		// Check if player look at floor and check angles
+		// ! Be aware. This detector is unstable. 
+		// ! I don't sure by 100%, but if player just look at floor (0deg) and didn't kill anybody
+		// ! this detector can say what he have AntiAim (AA)... need more tests!
+		// ? Idea: https://www.unknowncheats.me/forum/counterstrike-global-offensive/208735-detecting-player-antiaim.html
+		const m_flLowerBodyYawTarget = this.parent.suspectPlayer.getProp("DT_CSPlayer", "m_flLowerBodyYawTarget");
+		const lbyDelta = m_flLowerBodyYawTarget - this.parent.suspectPlayer.eyeAngles.yaw;
+		if (lbyDelta <= 40 || this.parent.suspectPlayer.eyeAngles.pitch !== 0) {
+			// All good
 			return;
-		}
-
-		if (this.parent.demo.gameRules.getProp("DT_CSGameRules", "m_bWarmupPeriod")) {
-			// Do not do this during warmup
-			return;
-		}
-
-		if ((tick % (10 * this.parent.demo.tickRate)) !== 0) {
-			// Only get position every 10 seconds
-			return;
-		}
-
-		this.roundPosition.push(this.parent.suspectPlayer.position);
-	}
-
-	OnRoundFreezeEnd(ev) {
-		if (!this.parent.suspectPlayer) {
-			return;
-		}
-
-		this.startPosition = this.parent.suspectPlayer.position;
-	}
-
-	OnRoundEnd(ev) {
-		if (this.roundPosition.length <= 0 || !this.startPosition) {
-			// Don't do any checks
-			return;
-		}
-
-		for (let pos of this.roundPosition) {
-			if (!almostEqual(pos.x, this.startPosition.x, this.config.parsing.afking.radius) ||
-				!almostEqual(pos.y, this.startPosition.y, this.config.parsing.afking.radius) ||
-				!almostEqual(pos.z, this.startPosition.z, this.config.parsing.afking.radius)
-			) {
-				// Suspect moved
-				return;
-			}
 		}
 
 		this.infractions.push({
 			tick: this.parent.demo.currentTick,
-			positions: this.roundPosition
+			angles: this.parent.suspectPlayer.eyeAngles,
+			lowerBodyYaw: m_flLowerBodyYawTarget,
+			lowerBodyDelta: lbyDelta
 		});
+	}
+
+	OnRoundFreezeEnd(ev) {
+		this.isActiveRound = true;
+	}
+
+	OnRoundEnd(ev) {
+		this.isActiveRound = false;
 	}
 };

@@ -1,46 +1,52 @@
 # CSGO Overwatch Bot
 
-Automatically solves Overwatch cases. Although **the detection algorithm for Aimbotting, AFKing & Wallhack are really bad and there is no Team harm detection**.
+Automatically solves Overwatch cases. Its not good but its trying.
 
-When running this you will get some unhandled cases which we simply don't care about.
+You can forcefully parse a demo by running `node force.js`, it will ask you for a demo file path and a suspect SteamID. Alternatively just use `node force.js <Demo> <SteamID>`
 
-You can forcefully parse a demo by simply putting it in the directory and running `node force.js`. You will get prompted to enter the name of the demo and the SteamID of your suspect.
+## VAC & Other Bans
 
-# Installation
+This script **does not** even initialize VAC, you cannot be VAC banned for a cheat detection using this. You **can** however get manually banned or even suspended from Steam entirely for using this. Valve does **not** want you to automate Overwatch cases. Use this at your own risk. I am not responsible for any bans, damages, lost items or anything else. You have been warned.
+
+## Installation
 
 1. Install [NodeJS](https://nodejs.org/)
-2. Clone this repository and extract it in a folder
+2. Download and extract this repository
 3. Open a command prompt inside the directory
-4. Run `npm install`
+4. Run `npm ci`
 5. Make a duplicate of the `config.json.example` and remove the `.example`
 6. Adjust your now called `config.json` - [See Config](#config)
 7. Run `node index.js`
+<<<<<<< HEAD
 8. After every update repeat from step 2 onwards to ensure everything required is up to date
 
 # Detections
+=======
+8. After every update repeat from step 3
+>>>>>>> 48ffed3427bacb17ec69ebff96f82016804d351a
 
-- **Aimbot**:
-- - Log the past X ticks, when the suspect gets a kill check all angles within the past X ticks. If the difference is above the threshold add an infraction.
-- **AFKing**:
-- - Everytime the round starts log the current position of the player on every tick, at the end of the round compare all the positions. If the player did not leave a specific radius within the entire round add an infraction.
-- **Wallhack**:
-- - On every kill just check if the event included the `penetrated` parameter and if its 1 or higher, meaning the last bullet was a wallbang. It will not work when the player only damages through a wall instead of killing.
-
-# Config
+## Config
 
 - `account`
-- - `username`: The account name you use to log into that account
-- - `password`: The password for the account
-- - `sharedSecret`: Optional shared secret for two factor authentication
+  - `username`: Your Steam account name
+  - `password`: Your Steam password
+  - `sharedSecret`: Optional shared secret to generate Mobile Steam Guard codes. Leave empty to enter manually.
 - `parsing`
-- - `steamWebAPIKey`: Optional Steam Web API key
-- - `minimumTime`: The minimum amount of seconds of parsing before sending the Conviction-Message
-- - `aimbot`
-- - - `maxTicks`: The maximum amount of ticks to check when the suspect gets a kill
-- - - `threshold`: The maximum threshold between angles before adding an Aimbot-Infraction
-- - `afking`
-- - - `radius`: If a player is within this radius an entire round it counts as an AFKing-Infraction
+  - `forceConvictOnPreviousBan`: When parsing is done the Suspect's Steam profile is checked for previous bans, if the previous ban is younger than this number of days it will forcefully convict the suspect for wallhack. Use `-1` to disable.
+  - `minimumTime`: Minimum amount of time in seconds for parsing to take before sending verdict to CSGO. If too low CSGO will ignore our verdict.
+  - `aimbot`
+    - `maxTicks`: Amount of ticks to check when the suspect gets a kill
+    - `threshold`: Maximum threshold between angles before adding an infraction for aimbotting
+  - `afking`
+    - `radius`: If the suspect is within this radius for an entire round count as infraction for griefing
+- `detectors`
+  - `Aimbot`: Enable/Disable aimbot detector
+  - `Wallhack`: Enable/Disable wallhack detector
+  - `Griefing`: Enable/Disable griefing detector
+  - `AFKing`: Enable/Disable afking detector
+  - `AntiAim`: Enable/Disable anti-aim detector (By @BlackYuzia)
 - `verdict`
+<<<<<<< HEAD
 - - `writeLog`: Should we write logs to a file?
 - - `backupDemo`: Should we backup the demo file?
 - - `maxVerdicts`: The maximum amount of cases we want to do. 0 for infinite
@@ -166,3 +172,16 @@ How Overwatch data is exchanged between GC and Client. The data shown below has 
 8. *Repeat*
 
 If we start the game with a Overwatch case already being assigned to us the GC wil respond with the same assigned case we got earlier. It might also respond with a new case incase our old case has expired, this is untested though.
+=======
+  - `writeLog`: Should we write our logs to a folder called `cases/<CaseID>`?
+  - `backupDemo`: Should we backup the Overwatch demo in a folder called `cases/<CaseID>`?
+  - `printScoreboard`: Should we print a scoreboard with player statistics to console?
+  - `maxVerdicts`: Maximum amount of Overwatch cases to do before stopping. `0` for unlimited.
+
+  - `minAimbot`: Minimum amount of aimbot infractions required to convict for aimbotting
+  - `minWallKills`: Minimum amount of kills through a wall required to convict for wallhacking
+  - `minAFKing`: Minimum amount of rounds the suspect must be AFK for to count as griefing
+  - `minAntiAim`: Minimum amount of anti-aim infractions the suspect must have before convicting for other
+  - `minTeamKills`: Minimum amount of team kills required to convict for griefing
+  - `minTeamDamage`: Minimum amount of team damage required to convict for griefing
+>>>>>>> 48ffed3427bacb17ec69ebff96f82016804d351a
