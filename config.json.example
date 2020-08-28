@@ -1,29 +1,37 @@
 {
 	"account": {
-		"username": "ExampleUsername",
-		"password": "ExamplePassword",
+		"username": "SteamUsername",
+		"password": "SteamPassword",
 		"sharedSecret": ""
 	},
 	"parsing": {
-		"steamWebAPIKey": "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+		"forceConvictOnPreviousBan": 3,
 		"minimumTime": 240,
 		"aimbot": {
 			"maxTicks": 10,
 			"threshold": 1.0
 		},
 		"afking": {
-			"radius": 80
+			"radius": 50
 		}
+	},
+	"detectors": {
+		"Aimbot": true,
+		"Wallhack": true,
+		"Griefing": true,
+		"AFKing": true,
+		"AntiAim": true
 	},
 	"verdict": {
 		"writeLog": true,
-		"backupDemo": false,
-		"maxVerdicts": 0,
-		"maxAimbot": 10,
-		"maxWallKills": 7,
-		"maxAFKing": 3
-	},
-	"richPresence": {
-		"steam_display": "#display_overwatch"
+		"backupDemo": true,
+		"maxVerdicts": 1,
+
+		"minAimbot": 10,
+		"minWallKills": 5,
+		"minAFKing": 3,
+		"minAntiAim": 10,
+		"minTeamKills": 2,
+		"minTeamDamage": 150
 	}
 }
