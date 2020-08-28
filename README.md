@@ -4,6 +4,10 @@ Automatically solves Overwatch cases. Its not good but its trying.
 
 You can forcefully parse a demo by running `node force.js`, it will ask you for a demo file path and a suspect SteamID. Alternatively just use `node force.js <Demo> <SteamID>`
 
+## VAC & Other Bans
+
+This script **does not** even initialize VAC, you cannot be VAC banned for a cheat detection using this. You **can** however get manually banned or even suspended from Steam entirely for using this. Valve does **not** want you to automate Overwatch cases. Use this at your own risk. I am not responsible for any bans, damages, lost items or anything else. You have been warned.
+
 ## Installation
 
 1. Install [NodeJS](https://nodejs.org/)
