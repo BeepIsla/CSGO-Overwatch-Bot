@@ -146,20 +146,20 @@ module.exports = class Helper {
 	}
 
 	static async DeleteRecursive(dir) {
-		let files = await fs.readdir(dir);
+		let files = await fs.promises.readdir(dir);
 
 		for (let file of files) {
 			let filePath = path.join(dir, file);
-			let stat = await fs.stat(filePath);
+			let stat = await fs.promises.stat(filePath);
 
 			if (stat.isDirectory()) {
 				await this.DeleteRecursive(filePath);
 			} else {
-				await fs.unlink(filePath);
+				await fs.promises.unlink(filePath);
 			}
 		}
 
-		await fs.rmdir(dir);
+		await fs.promises.rmdir(dir);
 	}
 
 	static ShiftNumber(index) {
