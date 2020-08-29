@@ -79,11 +79,14 @@ module.exports = class Demo {
 			console.log("\t- " + name + ": " + num);
 		}
 
+		let yes = this.config.verdict.logWithEmojis ? "✔️" : "YES";
+		let no = this.config.verdict.logWithEmojis ? "❌" : "NO";
+
 		console.log("Verdict:");
-		console.log("\t-   Aimbot: " + (this.obj.verdict.aimbot ? "✔️" : "❌"));
-		console.log("\t- Wallhack: " + (this.obj.verdict.wallhack ? "✔️" : "❌"));
-		console.log("\t-    Other: " + (this.obj.verdict.speedhack ? "✔️" : "❌"));
-		console.log("\t- Griefing: " + (this.obj.verdict.teamharm ? "✔️" : "❌"));
+		console.log("\t-   Aimbot: " + (this.obj.verdict.aimbot ? yes : no));
+		console.log("\t- Wallhack: " + (this.obj.verdict.wallhack ? yes : no));
+		console.log("\t-    Other: " + (this.obj.verdict.speedhack ? yes : no));
+		console.log("\t- Griefing: " + (this.obj.verdict.teamharm ? yes : no));
 	}
 
 	logScoreboard() {

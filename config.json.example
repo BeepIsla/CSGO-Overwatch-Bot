@@ -26,6 +26,7 @@
 		"writeLog": true,
 		"backupDemo": true,
 		"printScoreboard": true,
+		"logWithEmojis": true,
 		"maxVerdicts": 1,
 
 		"minAimbot": 10,
