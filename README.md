@@ -47,6 +47,7 @@ NodeJS 12+ version
   - `writeLog`: Should we write our logs to a folder called `cases/<CaseID>`?
   - `backupDemo`: Should we backup the Overwatch demo in a folder called `cases/<CaseID>`?
   - `printScoreboard`: Should we print a scoreboard with player statistics to console?
+  - `logWithEmojis`: Should we print with emojis? Set to `false` to use "YES"/"NO" instead of "✔️"/"❌"
   - `maxVerdicts`: Maximum amount of Overwatch cases to do before stopping. `0` for unlimited.
 
   - `minAimbot`: Minimum amount of aimbot infractions required to convict for aimbotting
