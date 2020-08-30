@@ -1,3 +1,8 @@
+# 2.1.2
+
+- Added rank and wins to scoreboard ([#104](https://github.com/BeepIsla/CSGO-Overwatch-Bot/issues/104))
+- Changed logged Suspect-SteamID to be a profile link instead ([#103](https://github.com/BeepIsla/CSGO-Overwatch-Bot/pull/103))
+
 # 2.1.1
 
 - Added `logWithEmojis` option - Set to `false` to disable emojis.
