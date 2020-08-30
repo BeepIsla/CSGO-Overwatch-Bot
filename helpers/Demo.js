@@ -30,6 +30,28 @@ const teamName = [
 	"Terrorists",
 	"Counter-Terrorists"
 ];
+const ranks = [
+	// Should not be hardcoded but rather from Translate.js but whatever
+	"Not Ranked",
+	"Silver I",
+	"Silver II",
+	"Silver III",
+	"Silver IV",
+	"Silver Elite",
+	"Silver Elite Master",
+	"Gold Nova I",
+	"Gold Nova II",
+	"Gold Nova III",
+	"Gold Nova Master",
+	"Master Guardian I",
+	"Master Guardian II",
+	"Master Guardian Elite",
+	"Distinguished Master Guardian",
+	"Legendary Eagle",
+	"Legendary Eagle Master",
+	"Supreme Master First Class",
+	"The Global Elite"
+];
 
 const detectors = fs.readdirSync(path.join(__dirname, "..", "detectors")).filter((file) => {
 	return file.endsWith(".js") && !file.startsWith("_");
@@ -117,6 +139,8 @@ module.exports = class Demo {
 				"Deaths",
 				"MVPs",
 				"Score",
+				"Rank",
+				"Wins",
 				"Team"
 			]
 		});
@@ -133,6 +157,8 @@ module.exports = class Demo {
 					player.deaths,
 					player.mvps,
 					player.score,
+					ranks[player.rank],
+					player.wins,
 					teamName[player.teamNumber]
 				].map((text) => {
 					if (player.steamID64 === this.suspect64Id) {
@@ -348,6 +374,9 @@ module.exports = class Demo {
 			for (let key of playerStats) {
 				this.players[player.steam64Id][key] = player[key];
 			}
+
+			this.players[player.steam64Id].rank = this.demo.entities.playerResource.props.m_iCompetitiveRanking[Helper.ShiftNumber(player.index)];
+			this.players[player.steam64Id].wins = this.demo.entities.playerResource.props.m_iCompetitiveWins[Helper.ShiftNumber(player.index)];
 		}
 	}
 };
