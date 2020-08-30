@@ -182,7 +182,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		console.log("            Total Rounds: " + body.numrounds);
 		console.log("         Rounds to watch: " + body.fractionrounds);
 		console.log("Overwatch starting round: " + (body.fractionid + 1)); // FractionID 0 = Round 1 (Pistol round)
-		console.log("                 Suspect: " + sid.getSteamID64());
+		console.log("                 Suspect: https://steamcommunity.com/profiles/" + sid.getSteamID64());
 		console.log("----- The whole demo will be analyzed ----");
 		console.log("Downloading demo...");
 
