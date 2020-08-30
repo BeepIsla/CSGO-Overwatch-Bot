@@ -61,6 +61,7 @@ module.exports = class AFKing {
 
 		if (this.parent.demo.gameRules.getProp("DT_CSGameRules", "m_bWarmupPeriod")) {
 			// Do not do this during warmup
+			this.roundPosition = [];
 			return;
 		}
 
@@ -78,6 +79,7 @@ module.exports = class AFKing {
 		}
 
 		this.startPosition = this.parent.suspectPlayer.position;
+		this.roundPosition = [];
 	}
 
 	OnRoundEnd(ev) {
@@ -92,6 +94,7 @@ module.exports = class AFKing {
 				!almostEqual(pos.z, this.startPosition.z, this.config.parsing.afking.radius)
 			) {
 				// Suspect moved
+				this.roundPosition = [];
 				return;
 			}
 		}
@@ -100,5 +103,6 @@ module.exports = class AFKing {
 			tick: this.parent.demo.currentTick,
 			positions: this.roundPosition
 		});
+		this.roundPosition = [];
 	}
 };
