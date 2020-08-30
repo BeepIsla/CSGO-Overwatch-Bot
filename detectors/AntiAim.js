@@ -46,7 +46,7 @@ module.exports = class AntiAim {
 	 * Custom Methods *
 	 ******************/
 	OnTickEnd(tick) {
-		if (!this.parent.suspectPlayer || !this.parent.suspectPlayer.isAlive || /*!this.isActiveRound ||*/
+		if (!this.parent.suspectPlayer || !this.parent.suspectPlayer.isAlive || !this.isActiveRound ||
 			this.parent.demo.gameRules.getProp("DT_CSGameRules", "m_bWarmupPeriod")
 		) {
 			// Suspect left, is dead, round is not active or in warmup
