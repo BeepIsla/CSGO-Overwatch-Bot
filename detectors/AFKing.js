@@ -65,7 +65,7 @@ module.exports = class AFKing {
 			return;
 		}
 
-		if ((tick % (10 * this.parent.demo.tickRate)) !== 0) {
+		if ((tick % (10 * this.parent.demo.tickRate)) > 1) {
 			// Only get position every 10 seconds
 			return;
 		}
@@ -89,9 +89,9 @@ module.exports = class AFKing {
 		}
 
 		for (let pos of this.roundPosition) {
-			if (!almostEqual(pos.x, this.startPosition.x, this.config.parsing.afking.radius) ||
-				!almostEqual(pos.y, this.startPosition.y, this.config.parsing.afking.radius) ||
-				!almostEqual(pos.z, this.startPosition.z, this.config.parsing.afking.radius)
+			if (!almostEqual(pos.x, this.startPosition.x, this.config.parsing.afking.radius, 0) ||
+				!almostEqual(pos.y, this.startPosition.y, this.config.parsing.afking.radius, 0) ||
+				!almostEqual(pos.z, this.startPosition.z, this.config.parsing.afking.radius, 0)
 			) {
 				// Suspect moved
 				this.roundPosition = [];
