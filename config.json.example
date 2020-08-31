@@ -27,7 +27,7 @@
 		"backupDemo": true,
 		"printScoreboard": true,
 		"logWithEmojis": true,
-		"maxVerdicts": 1,
+		"maxVerdicts": 0,
 
 		"minAimbot": 10,
 		"minWallKills": 5,
