@@ -191,6 +191,8 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		let response = await Helper.Fetch(body.caseurl).catch(() => { });
 		if (!response || !response.ok) {
 			// Something failed while downloading - Tell the GC about it and abandon
+			console.error(new Error("Failed to download case. Check your internet connection"));
+
 			await coordinator.sendMessage(
 				730,
 				protobufs.data.csgo.ECsgoGCMsg.k_EMsgGCCStrike15_v2_PlayerOverwatchCaseStatus,
