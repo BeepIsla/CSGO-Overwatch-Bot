@@ -1,3 +1,9 @@
+# 2.1.3
+
+- Added cases completed in current session counter
+- Changed default cases to complete to unlimited (From `1`)
+- Fixed AFK detection ([#108](https://github.com/BeepIsla/CSGO-Overwatch-Bot/pull/108))
+
 # 2.1.2
 
 - Added rank and wins to scoreboard ([#104](https://github.com/BeepIsla/CSGO-Overwatch-Bot/issues/104))
