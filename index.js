@@ -357,7 +357,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		}
 		demo.logResults();
 
-		console.log("Cases completed this session: " + casesCompleted);
+		console.log("Cases completed this session: " + ++casesCompleted);
 
 		// Log timings
 		let longestKey = Math.max(Object.keys(timings).map(k => k.length));
@@ -419,7 +419,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 			steam_display: "#display_Menu"
 		});
 
-		if (config.verdict.maxVerdicts > 0 && ++casesCompleted >= config.verdict.maxVerdicts) {
+		if (config.verdict.maxVerdicts > 0 && casesCompleted >= config.verdict.maxVerdicts) {
 			console.log("Finished doing " + config.verdict.maxVerdicts + " verdict" + (config.verdict.maxVerdicts === 1 ? "" : "s"));
 			steam.logOff();
 			process.exitCode = 0; // Success exit code - PM2 or whatever the user uses should not restart the process
