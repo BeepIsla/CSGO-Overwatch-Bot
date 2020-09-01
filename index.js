@@ -357,6 +357,8 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		}
 		demo.logResults();
 
+		console.log("Cases completed this session: " + casesCompleted);
+
 		// Log timings
 		let longestKey = Math.max(Object.keys(timings).map(k => k.length));
 		let longestTiming = Math.max(Object.keys(timings).map(k => timings[k].toString().length));
