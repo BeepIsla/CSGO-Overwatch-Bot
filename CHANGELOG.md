@@ -1,3 +1,8 @@
+# 2.1.4
+
+- Updated protobufs to latest version
+- Fixed softlock ([#120](https://github.com/BeepIsla/CSGO-Overwatch-Bot/issues/120))
+
 # 2.1.3
 
 - Added cases completed in current session counter
