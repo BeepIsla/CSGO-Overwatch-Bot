@@ -442,5 +442,21 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 				reason: Helper.OverwatchConstants.EMMV2OverwatchCasesUpdateReason_t.k_EMMV2OverwatchCasesUpdateReason_Assign
 			})
 		);
+	} else if (typeof body.reason === "undefined" &&
+		typeof body.verdict === "undefined" &&
+		typeof body.throttleseconds === "number"
+	) {
+		console.log("Waiting " + body.throttleseconds + " seconds before requesting a case...");
+		await new Promise(p => setTimeout(p, body.throttleseconds * 1000));
+
+		console.log("Attempt to get Overwatch case...");
+		await coordinator.sendMessage(
+			730,
+			protobufs.data.csgo.ECsgoGCMsg.k_EMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate,
+			{},
+			protobufs.encodeProto("CMsgGCCStrike15_v2_PlayerOverwatchCaseUpdate", {
+				reason: Helper.OverwatchConstants.EMMV2OverwatchCasesUpdateReason_t.k_EMMV2OverwatchCasesUpdateReason_Assign
+			})
+		);
 	}
 });
