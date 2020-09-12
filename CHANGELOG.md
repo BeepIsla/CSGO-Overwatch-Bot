@@ -1,3 +1,11 @@
+# 2.2.0
+
+- Added invisible mode ([#116](https://github.com/BeepIsla/CSGO-Overwatch-Bot/issues/116))
+- Updated dependencies
+  - `eslint` from `7.7.0` to `7.8.1`
+  - `node-fetch` from `2.6.0` to `2.6.1`
+  - `steam-user` from `4.17.1` to `4.18.0`
+
 # 2.1.4
 
 - Updated protobufs to latest version
