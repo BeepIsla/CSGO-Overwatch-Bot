@@ -70,7 +70,7 @@ let timings = {
 
 steam.on("loggedOn", async () => {
 	console.log("Successfully logged into " + steam.steamID.toString());
-	steam.setPersona(config.invisible ? SteamUser.EPersonaState.Invisible : SteamUser.EPersonaState.Online);
+	steam.setPersona(config.account.invisible ? SteamUser.EPersonaState.Invisible : SteamUser.EPersonaState.Online);
 
 	console.log("Establishing CSGO GameCoordinator connection...");
 	steam.gamesPlayed([730]);
