@@ -104,7 +104,7 @@ steam.on("loggedOn", async () => {
 	mmWelcome = protobufs.decodeProto("CMsgGCCStrike15_v2_MatchmakingGC2ClientHello", mmWelcome);
 
 	let rank = mmWelcome.ranking;
-	if (rank.rank_type_id !== 6) { // Competitive ID
+	if (!rank || rank.rank_type_id !== 6) { // Competitive ID
 		rank = await coordinator.sendMessage(
 			730,
 			protobufs.data.csgo.ECsgoGCMsg.k_EMsgGCCStrike15_v2_ClientGCRankUpdate,
