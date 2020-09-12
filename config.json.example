@@ -2,7 +2,8 @@
 	"account": {
 		"username": "SteamUsername",
 		"password": "SteamPassword",
-		"sharedSecret": ""
+		"sharedSecret": "",
+		"invisible": false
 	},
 	"parsing": {
 		"forceConvictOnPreviousBan": 3,
