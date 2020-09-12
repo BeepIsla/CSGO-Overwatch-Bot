@@ -74,7 +74,7 @@ new Promise((resolve, reject) => {
 
 		let demo = new Demo(buffer, sid.getSteamID64(), config);
 		let lastVal = 0;
-		demo.demo.on("progress", (progressFraction) => {
+		demo.progressCallback = (progressFraction) => {
 			let percentage = Math.round(progressFraction * 100);
 			if (lastVal === percentage || (percentage % 10) !== 0) {
 				return;
@@ -83,7 +83,7 @@ new Promise((resolve, reject) => {
 
 			process.stdout.write("\r\x1b[K"); // Clear current line
 			process.stdout.write("Parsing: " + percentage + "%");
-		});
+		};
 
 		process.stdout.write("Parsing: 0%");
 		demo.parse().then((data) => {

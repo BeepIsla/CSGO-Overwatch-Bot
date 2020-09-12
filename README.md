@@ -1,5 +1,9 @@
 # CSGO Overwatch Bot
 
+### **WARNING: You are currently viewing the `worker` branch of this bot. This is experimental. Do not use unless you know what you are doing.**
+
+---
+
 Automatically solves Overwatch cases. Its not good but its trying.
 
 You can forcefully parse a demo by running `node force.js`, it will ask you for a demo file path and a suspect SteamID. Alternatively just use `node force.js <Demo> <SteamID>`

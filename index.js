@@ -296,7 +296,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 
 		let demo = new Demo(demoBuffer, sid.getSteamID64(), config);
 		let lastVal = 0;
-		demo.demo.on("progress", (progressFraction) => {
+		demo.progressCallback  = (progressFraction) => {
 			let percentage = Math.round(progressFraction * 100);
 			if (lastVal === percentage || (percentage % 10) !== 0) {
 				return;
@@ -305,7 +305,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 
 			process.stdout.write("\r\x1b[K"); // Clear current line
 			process.stdout.write("Parsing: " + percentage + "%");
-		});
+		};
 
 		timings.Parsing = Date.now();
 
@@ -349,7 +349,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		let timeTotal = timings.Downloading + timings.Parsing + timings.Unpacking;
 		if (config.verdict.writeLog) {
 			data.timings = timings;
-			data.timings.total = timeTotal;
+			data.timings.Total = timeTotal;
 			fs.writeFileSync("cases/" + body.caseid + "/data.json", JSON.stringify(data, null, "\t"));
 		}
 
