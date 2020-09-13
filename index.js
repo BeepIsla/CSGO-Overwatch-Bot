@@ -119,14 +119,22 @@ steam.on("loggedOn", async () => {
 		);
 
 		rank = protobufs.decodeProto("CMsgGCCStrike15_v2_ClientGCRankUpdate", rank);
-		rank = rank.rankings[0];
+		if (rank.rankings && rank.rankings[0]) {
+			rank = rank.rankings[0];
+		} else {
+			rank = undefined;
+		}
 	}
 
-	console.log("We are " + Translate("skillgroup_" + rank.rank_id) + " with " + rank.wins + " win" + (rank.wins === 1 ? "" : "s"));
-	if (rank.rank_id < 7 || rank.wins < 150) {
-		console.log((rank.rank_id < 7 ? "Our rank is too low" : "We do not have enough wins") + " in order to request Overwatch cases. You need at least 150 wins and " + Translate("skillgroup_7") + ".");
-		steam.logOff();
-		return;
+	if (rank) {
+		console.log("We are " + Translate("skillgroup_" + rank.rank_id) + " with " + rank.wins + " win" + (rank.wins === 1 ? "" : "s"));
+		if (rank.rank_id < 7 || rank.wins < 150) {
+			console.log((rank.rank_id < 7 ? "Our rank is too low" : "We do not have enough wins") + " in order to request Overwatch cases. You need at least 150 wins and " + Translate("skillgroup_7") + ".");
+			steam.logOff();
+			return;
+		}
+	} else {
+		console.log("Failed to receive rank - Assuming we have access to Overwatch");
 	}
 
 	console.log("Checking for Overwatch access...");
