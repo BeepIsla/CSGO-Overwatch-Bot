@@ -1,7 +1,7 @@
 # 2.2.1
 
 - Potentially fixed rank fetching sometimes failing
-  - If anything fails will just assume we have access and attempt to get a case anyways
+  - If everything fails will just assume we have access and attempt to get a case anyways
 - Fixed invisible mode ([#129](https://github.com/BeepIsla/CSGO-Overwatch-Bot/issues/129))
 
 # 2.2.0
