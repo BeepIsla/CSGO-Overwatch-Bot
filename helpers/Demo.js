@@ -88,7 +88,7 @@ module.exports = class Demo {
 	}
 
 	logResults() {
-		console.log("Infrations:");
+		console.log("Infractions:");
 
 		let longestKey = Math.max(...Object.keys(this.obj.detectors).map(k => k.length));
 		let longestNum = Math.max(...Object.keys(this.obj.detectors).map(k => this.obj.detectors[k].raw.length.toString().length));
