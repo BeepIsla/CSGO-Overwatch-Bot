@@ -1,3 +1,8 @@
+# 2.3.0
+
+- Added option to save login key to bypass Steam Guard for future logins ([#129](https://github.com/BeepIsla/CSGO-Overwatch-Bot/issues/129))
+- Fixed typo ([#131](https://github.com/BeepIsla/CSGO-Overwatch-Bot/pull/131))
+
 # 2.2.1
 
 - Potentially fixed rank fetching sometimes failing
