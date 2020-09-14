@@ -60,11 +60,28 @@ let timings = {
 	console.log("Fetching CSGO translation file...");
 	await Translate.fetchTokens("csgo_english.txt");
 
+	// Get login key if we have one
+	let dataPath = path.join(__dirname, "data");
+	if (!fs.existsSync(dataPath)) {
+		fs.mkdirSync(dataPath);
+	}
+
+	let loginkeyPath = path.join(dataPath, "loginkey");
+	let keyData = fs.existsSync(loginkeyPath) ? fs.readFileSync(loginkeyPath).toString() : undefined;
+	try {
+		keyData = keyData ? JSON.parse(keyData) : undefined;
+	} catch {
+		console.log("Failed to parse loginKey from previous session.");
+	}
+	let useLoginKey = keyData && keyData.account === config.account.username && config.account.saveSteamGuard;
+
 	console.log("Logging into Steam...");
 	steam.logOn({
 		accountName: config.account.username,
-		password: config.account.password,
-		twoFactorCode: config.account.sharedSecret && config.account.sharedSecret.length > 5 ? SteamTotp.getAuthCode(config.account.sharedSecret) : undefined
+		password: useLoginKey ? undefined : config.account.password,
+		twoFactorCode: useLoginKey ? undefined : (config.account.sharedSecret && config.account.sharedSecret.length > 5 ? SteamTotp.getAuthCode(config.account.sharedSecret) : undefined),
+		loginKey: useLoginKey ? keyData.loginKey : undefined,
+		rememberPassword: config.account.saveSteamGuard
 	});
 })();
 
@@ -155,6 +172,22 @@ steam.on("loggedOn", async () => {
 steam.on("disconnected", (eresult, msg) => {
 	console.log("Disconnected from Steam with EResult " + eresult + " and message " + msg);
 	process.exitCode = 1;
+});
+
+steam.on("loginKey", (key) => {
+	if (!config.account.saveSteamGuard) {
+		return;
+	}
+
+	let dataPath = path.join(__dirname, "data");
+	if (!fs.existsSync(dataPath)) {
+		fs.mkdirSync(dataPath);
+	}
+
+	fs.writeFileSync(path.join(dataPath, "loginKey"), JSON.stringify({
+		loginKey: key,
+		account: config.account.username
+	}));
 });
 
 coordinator.on("receivedFromGC", async (msgType, payload) => {

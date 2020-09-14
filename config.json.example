@@ -3,6 +3,7 @@
 		"username": "SteamUsername",
 		"password": "SteamPassword",
 		"sharedSecret": "",
+		"saveSteamGuard": false,
 		"invisible": false
 	},
 	"parsing": {

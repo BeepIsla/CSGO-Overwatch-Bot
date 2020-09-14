@@ -29,6 +29,7 @@ NodeJS 12+ version
   - `username`: Your Steam account name
   - `password`: Your Steam password
   - `sharedSecret`: Optional shared secret to generate Mobile Steam Guard codes. Leave empty to enter manually.
+  - `saveSteamGuard`: Set to `true` to save login key between sessions - **This key bypasses Password and Steam Guard (Stored in `data/loginKey`)**
   - `invisible`: Set to `true` to show as offline on Steam
 - `parsing`
   - `forceConvictOnPreviousBan`: When parsing is done the Suspect's Steam profile is checked for previous bans, if the previous ban is younger than this number of days it will forcefully convict the suspect for wallhack. Use `-1` to disable.
