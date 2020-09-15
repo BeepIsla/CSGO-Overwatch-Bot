@@ -116,7 +116,7 @@ steam.on("loggedOn", async () => {
 			welcome = protobufs.decodeProto("CMsgClientWelcome", welcome);
 			let flags = Helper.GetXPFlagsFromWelcome(welcome);
 
-			// The above parsers various things but we only care about the Overwatch one so ignore everything else
+			// The above parses various things but we only care about the Overwatch one so ignore everything else
 			for (let flag of flags) {
 				if (!flag.title.includes("Overwatch")) {
 					continue;
