@@ -190,6 +190,20 @@ steam.on("loginKey", (key) => {
 	}));
 });
 
+steam.on("error", (err) => {
+	if (err.eresult !== 5) {
+		throw err;
+	}
+
+	console.log("Login with saved loginKey failed. Logging in without loginKey...");
+	steam.logOn({
+		accountName: config.account.username,
+		password: config.account.password,
+		twoFactorCode: config.account.sharedSecret && config.account.sharedSecret.length > 5 ? SteamTotp.getAuthCode(config.account.sharedSecret) : undefined,
+		rememberPassword: config.account.saveSteamGuard
+	});
+});
+
 coordinator.on("receivedFromGC", async (msgType, payload) => {
 	if (msgType !== protobufs.data.csgo.ECsgoGCMsg.k_EMsgGCCStrike15_v2_PlayerOverwatchCaseAssignment) {
 		return;
