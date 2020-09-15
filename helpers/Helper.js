@@ -5,6 +5,7 @@ const fetch = require("node-fetch");
 const unzipper = require("unzipper");
 const cheerio = require("cheerio");
 const Protobufs = require("./Protobufs.js");
+const XpBonusFlagsHelper = require("./XpBonusFlagsHelper.js");
 const BAN_REGEX = /(?<days>\d+)\s+day\(s\)\s+since\s+last\s+ban/;
 
 module.exports = class Helper {
@@ -181,5 +182,32 @@ module.exports = class Helper {
 		}
 
 		return Number(match.groups.days);
+	}
+
+	static GetXPFlagsFromWelcome(welcome) {
+		let protobufs = new Protobufs([
+			{
+				name: "csgo",
+				protos: [
+					path.join(__dirname, "..", "protobufs", "csgo", "base_gcmessages.proto")
+				]
+			}
+		]);
+
+		for (let cache of welcome.outofdate_subscribed_caches) {
+			for (let object of cache.objects) {
+				for (let objectData of object.object_data) {
+					if (object.type_id !== 7) {
+						// There are lots of types such as CSOEconItem, CSOPersonaDataPublic, CSOQuestProgress, etc...
+						// But we only care about "7" aka CSOEconGameAccountClient
+						continue;
+					}
+
+					let clientAccount = protobufs.decodeProto("CSOEconGameAccountClient", objectData);
+					let flags = XpBonusFlagsHelper.ParseBonusXPFlags(clientAccount.bonus_xp_usedflags);
+					return XpBonusFlagsHelper.StringifyFlags(flags);
+				}
+			}
+		}
 	}
 };

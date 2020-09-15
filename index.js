@@ -5,6 +5,7 @@ const SteamUser = require("steam-user");
 const SteamTotp = require("steam-totp");
 const SteamID = require("steamid");
 const unbzip2 = require("unbzip2-stream");
+const cliTable = require("cli-table3");
 const Helper = require("./helpers/Helper.js");
 const Coordinator = require("./helpers/Coordinator.js");
 const Protobufs = require("./helpers/Protobufs.js");
@@ -104,7 +105,29 @@ steam.on("loggedOn", async () => {
 		).catch(() => { });
 
 		if (welcome) {
-			// We don't care about the actual content
+			if (!config.account.notifyXPReward) {
+				// Skip
+				break;
+			}
+
+			// Parse response and get flags from it
+			// TODO: Can you receive new flags while already logged in? If yes handle these and notify the user as soon as possible.
+			// Its most likely possible but I am too lazy so I want confirmation first.
+			welcome = protobufs.decodeProto("CMsgClientWelcome", welcome);
+			let flags = Helper.GetXPFlagsFromWelcome(welcome);
+
+			// The above parsers various things but we only care about the Overwatch one so ignore everything else
+			for (let flag of flags) {
+				if (!flag.title.includes("Overwatch")) {
+					continue;
+				}
+
+				let table = new cliTable({
+					head: [ flag.title ]
+				});
+				table.push([ flag.description ]);
+				console.log(table.toString());
+			}
 			break;
 		}
 	}
