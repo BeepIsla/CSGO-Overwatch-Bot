@@ -1,3 +1,9 @@
+# 2.4.0
+
+- Added option to notify about Overwatch XP reward
+- Fixed logging in with invalid loginKey causing process exit
+  - Now falls back to logging in without loginKey
+
 # 2.3.0
 
 - Added option to save login key to bypass Steam Guard for future logins ([#129](https://github.com/BeepIsla/CSGO-Overwatch-Bot/issues/129))
