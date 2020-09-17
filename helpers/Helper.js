@@ -184,7 +184,7 @@ module.exports = class Helper {
 		return Number(match.groups.days);
 	}
 
-	static GetXPFlagsFromWelcome(welcome) {
+	static GetXPFlags(caches) {
 		let protobufs = new Protobufs([
 			{
 				name: "csgo",
@@ -194,7 +194,7 @@ module.exports = class Helper {
 			}
 		]);
 
-		for (let cache of welcome.outofdate_subscribed_caches) {
+		for (let cache of caches) {
 			for (let object of cache.objects) {
 				for (let objectData of object.object_data) {
 					if (object.type_id !== 7) {

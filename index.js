@@ -17,6 +17,9 @@ const steam = new SteamUser({
 	autoRelogin: false // Do not automatically log back in - Process must exit and an external program like PM2 must auto restart
 });
 const coordinator = new Coordinator(steam, 730);
+const objectHandler = {};
+const notifications = []; // To be sent to console between cases
+let notifiedOfOverwatchBonusXP = false; // Only notify once per session at most
 let protobufs = undefined;
 let casesCompleted = 0;
 let timings = {
@@ -41,6 +44,9 @@ let timings = {
 			protos: path.join(__dirname, "protobufs", "csgo")
 		}
 	]);
+	objectHandler[protobufs.data.csgo.ESOMsg.k_ESOMsg_Create] = "CMsgSOSingleObject";
+	objectHandler[protobufs.data.csgo.ESOMsg.k_ESOMsg_Update] = "CMsgSOSingleObject";
+	objectHandler[protobufs.data.csgo.ESOMsg.k_ESOMsg_UpdateMultiple] = "CMsgSOMultipleObjects";
 
 	console.log("Checking for updates...");
 	try {
@@ -111,10 +117,8 @@ steam.on("loggedOn", async () => {
 			}
 
 			// Parse response and get flags from it
-			// TODO: Can you receive new flags while already logged in? If yes handle these and notify the user as soon as possible.
-			// Its most likely possible but I am too lazy so I want confirmation first.
 			welcome = protobufs.decodeProto("CMsgClientWelcome", welcome);
-			let flags = Helper.GetXPFlagsFromWelcome(welcome);
+			let flags = Helper.GetXPFlags(welcome.outofdate_subscribed_caches);
 
 			// The above parses various things but we only care about the Overwatch one so ignore everything else
 			for (let flag of flags) {
@@ -123,10 +127,11 @@ steam.on("loggedOn", async () => {
 				}
 
 				let table = new cliTable({
-					head: [ flag.title ]
+					head: [flag.title]
 				});
-				table.push([ flag.description ]);
+				table.push([flag.description]);
 				console.log(table.toString());
+				notifiedOfOverwatchBonusXP = true;
 			}
 			break;
 		}
@@ -228,6 +233,50 @@ steam.on("error", (err) => {
 });
 
 coordinator.on("receivedFromGC", async (msgType, payload) => {
+	if (config.account.notifyXPReward && !notifiedOfOverwatchBonusXP && objectHandler[msgType]) {
+		let body = protobufs.decodeProto(objectHandler[msgType], payload);
+		if (!Array.isArray(body.objects_modified) && body.type_id && body.object_data) {
+			// Single - Make fake multi
+			body = {
+				objects_modified: [
+					{
+						type_id: body.type_id,
+						object_data: [
+							body.object_data
+						]
+					}
+				]
+			};
+		}
+
+		// Pass as fake cache
+		let flags = Helper.GetXPFlags([
+			{
+				objects: body.objects_modified
+			}
+		]);
+
+		// The above parses various things but we only care about the Overwatch one so ignore everything else
+		for (let flag of flags) {
+			if (!flag.title.includes("Overwatch")) {
+				continue;
+			}
+
+			let table = new cliTable({
+				head: [flag.title]
+			});
+			table.push([flag.description]);
+
+			if (notifications.includes("Overwatch")) {
+				// A notification about this is already pending
+				continue;
+			}
+
+			notifications.push(table.toString());
+			notifiedOfOverwatchBonusXP = true;
+		}
+	}
+
 	if (msgType !== protobufs.data.csgo.ECsgoGCMsg.k_EMsgGCCStrike15_v2_PlayerOverwatchCaseAssignment) {
 		return;
 	}
@@ -498,6 +547,10 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		steam.uploadRichPresence(730, {
 			steam_display: "#display_Menu"
 		});
+
+		while (notifications.length > 0) {
+			console.log(notifications.shift());
+		}
 
 		if (config.verdict.maxVerdicts > 0 && casesCompleted >= config.verdict.maxVerdicts) {
 			console.log("Finished doing " + config.verdict.maxVerdicts + " verdict" + (config.verdict.maxVerdicts === 1 ? "" : "s"));
