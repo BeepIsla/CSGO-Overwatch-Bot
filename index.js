@@ -21,6 +21,7 @@ const objectHandler = {};
 const notifications = []; // To be sent to console between cases
 let notifiedOfOverwatchBonusXP = false; // Only notify once per session at most
 let protobufs = undefined;
+let playStateBlocked = false;
 let casesCompleted = 0;
 let timings = {
 	Downloading: 0,
@@ -92,15 +93,27 @@ let timings = {
 	});
 })();
 
-steam.on("loggedOn", async () => {
+steam.on("loggedOn", () => {
 	console.log("Successfully logged into " + steam.steamID.toString());
 	steam.setPersona(config.account.invisible ? SteamUser.EPersonaState.Invisible : SteamUser.EPersonaState.Online);
 
-	console.log("Establishing CSGO GameCoordinator connection...");
 	steam.gamesPlayed([730]);
+});
+
+steam.on("appLaunched", async (appID) => {
+	if (appID !== 730) {
+		return;
+	}
+
+	console.log("Establishing CSGO GameCoordinator connection...");
 
 	let helloBuf = protobufs.encodeProto("CMsgClientHello", {});
 	while (true) {
+		if (playStateBlocked) {
+			// We are blocked
+			return;
+		}
+
 		let welcome = await coordinator.sendMessage(
 			730,
 			protobufs.data.csgo.EGCBaseClientMsg.k_EMsgGCClientHello,
@@ -148,6 +161,11 @@ steam.on("loggedOn", async () => {
 	);
 	mmWelcome = protobufs.decodeProto("CMsgGCCStrike15_v2_MatchmakingGC2ClientHello", mmWelcome);
 
+	if (playStateBlocked) {
+		// We are blocked
+		return;
+	}
+
 	let rank = mmWelcome.ranking;
 	if (!rank || rank.rank_type_id !== 6) { // Competitive ID
 		rank = await coordinator.sendMessage(
@@ -171,6 +189,11 @@ steam.on("loggedOn", async () => {
 		}
 	}
 
+	if (playStateBlocked) {
+		// We are blocked
+		return;
+	}
+
 	if (rank) {
 		console.log("We are " + Translate("skillgroup_" + rank.rank_id) + " with " + rank.wins + " win" + (rank.wins === 1 ? "" : "s"));
 		if (rank.rank_id < 7 || rank.wins < 150) {
@@ -191,6 +214,11 @@ steam.on("loggedOn", async () => {
 			reason: Helper.OverwatchConstants.EMMV2OverwatchCasesUpdateReason_t.k_EMMV2OverwatchCasesUpdateReason_Poll
 		})
 	);
+
+	if (playStateBlocked) {
+		// We are blocked
+		return;
+	}
 
 	steam.uploadRichPresence(730, {
 		steam_display: "#display_Menu"
@@ -218,6 +246,21 @@ steam.on("loginKey", (key) => {
 	}));
 });
 
+steam.on("playingState", (blocked, playingApp) => {
+	if (playStateBlocked === blocked) {
+		return;
+	}
+	playStateBlocked = blocked;
+
+	if (playStateBlocked) {
+		console.log("App " + playingApp + " was started on another Steam client. Waiting...");
+		steam.gamesPlayed([]);
+	} else {
+		console.log("Other Steam client stopped playing. Resuming...");
+		steam.gamesPlayed([730]);
+	}
+});
+
 steam.on("error", (err) => {
 	if (err.eresult !== 5) {
 		throw err;
@@ -233,6 +276,11 @@ steam.on("error", (err) => {
 });
 
 coordinator.on("receivedFromGC", async (msgType, payload) => {
+	if (playStateBlocked) {
+		// We are blocked
+		return;
+	}
+
 	if (config.account.notifyXPReward && !notifiedOfOverwatchBonusXP && objectHandler[msgType]) {
 		let body = protobufs.decodeProto(objectHandler[msgType], payload);
 		if (!Array.isArray(body.objects_modified) && body.type_id && body.object_data) {
@@ -316,6 +364,11 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		timings.Downloading = Date.now();
 
 		let response = await Helper.Fetch(body.caseurl).catch(() => { });
+		if (playStateBlocked) {
+			// We are blocked
+			return;
+		}
+	
 		if (!response || !response.ok) {
 			// Something failed while downloading - Tell the GC about it and abandon
 			console.error(new Error("Failed to download case. Check your internet connection"));
@@ -339,6 +392,11 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		let buffer = await response.buffer().catch(() => { });
 		timings.Downloading = Date.now() - timings.Downloading;
 
+		if (playStateBlocked) {
+			// We are blocked
+			return;
+		}
+	
 		console.log("Unpacking demo...");
 
 		timings.Unpacking = Date.now();
@@ -383,6 +441,11 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 			return;
 		}
 
+		if (playStateBlocked) {
+			// We are blocked
+			return;
+		}
+	
 		timings.Unpacking = Date.now() - timings.Unpacking;
 
 		if (config.verdict.writeLog || config.verdict.backupDemo) {
@@ -452,6 +515,11 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		process.stdout.write("\n");
 		timings.Parsing = Date.now() - timings.Parsing;
 
+		if (playStateBlocked) {
+			// We are blocked
+			return;
+		}
+	
 		// Force convict?
 		if (typeof config.parsing.forceConvictOnPreviousBan === "number" && config.parsing.forceConvictOnPreviousBan >= 0) {
 			data.forceConvictEnabled = false;
@@ -523,6 +591,11 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 			await new Promise(p => setTimeout(p, diff));
 		}
 
+		if (playStateBlocked) {
+			// We are blocked
+			return;
+		}
+
 		console.log("Sending verdict to CSGO...");
 
 		// Send verdict
@@ -564,6 +637,11 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		console.log("Waiting " + delay + " seconds before requesting a new case...");
 		await new Promise(p => setTimeout(p, delay * 1000));
 
+		if (playStateBlocked) {
+			// We are blocked
+			return;
+		}
+
 		console.log("Attempt to get Overwatch case...");
 		await coordinator.sendMessage(
 			730,
@@ -579,6 +657,11 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 	) {
 		console.log("Waiting " + body.throttleseconds + " seconds before requesting a case...");
 		await new Promise(p => setTimeout(p, body.throttleseconds * 1000));
+
+		if (playStateBlocked) {
+			// We are blocked
+			return;
+		}
 
 		console.log("Attempt to get Overwatch case...");
 		await coordinator.sendMessage(
