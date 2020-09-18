@@ -225,7 +225,7 @@ steam.on("appLaunched", async (appID) => {
 	}
 
 	if (rank) {
-		console.log("We are " + Translate("skillgroup_" + rank.rank_id) + " with " + rank.wins + " win" + (rank.wins === 1 ? "" : "s"));
+		console.log("We are \"" + Translate("RankName_" + rank.rank_id) + "\" with " + rank.wins + " win" + (rank.wins === 1 ? "" : "s"));
 		if (rank.rank_id < 7 || rank.wins < 150) {
 			console.log((rank.rank_id < 7 ? "Our rank is too low" : "We do not have enough wins") + " in order to request Overwatch cases. You need at least 150 wins and " + Translate("skillgroup_7") + ".");
 			steam.logOff();
