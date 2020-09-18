@@ -166,6 +166,36 @@ steam.on("appLaunched", async (appID) => {
 		return;
 	}
 
+	if (Helper.MatchmakingKickBanReason.IsPermanent(mmWelcome.penalty_reason)) {
+		console.log("Cannot do Overwatch cases while game banned.");
+		steam.logOff();
+		return;
+	}
+
+	if (Helper.MatchmakingKickBanReason.IsGlobal(mmWelcome.penalty_reason)) {
+		console.log("Cannot do Overwatch cases while on global cooldown.");
+		steam.logOff();
+		return;
+	}
+
+	if (Helper.MatchmakingKickBanReason.IsGreen(mmWelcome.penalty_reason)) {
+		console.log("Cannot do Overwatch cases while on temporary cooldown.");
+		steam.logOff();
+		return;
+	}
+
+	if (typeof mmWelcome.penalty_reason === "number" && mmWelcome.penalty_reason > 0) {
+		console.log("Cannot do Overwatch cases while on cooldown.");
+		steam.logOff();
+		return;
+	}
+
+	if (typeof mmWelcome.vac_banned === "number" && mmWelcome.vac_banned > 0) {
+		console.log("Cannot do Overwatch cases while VAC banned.");
+		steam.logOff();
+		return;
+	}
+
 	let rank = mmWelcome.ranking;
 	if (!rank || rank.rank_type_id !== 6) { // Competitive ID
 		rank = await coordinator.sendMessage(
