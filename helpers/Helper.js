@@ -7,6 +7,30 @@ const cheerio = require("cheerio");
 const Protobufs = require("./Protobufs.js");
 const XpBonusFlagsHelper = require("./XpBonusFlagsHelper.js");
 const BAN_REGEX = /(?<days>\d+)\s+day\(s\)\s+since\s+last\s+ban/;
+const OS = {
+	"linux": [
+		"freebsd",
+		"linux",
+		"openbsd"
+	],
+	"osx": [
+		"drawin"
+	],
+	"win": [
+		"win32"
+	]
+};
+const ARCH = {
+	"32": [
+		"arm",
+		"x32",
+		"ia32"
+	],
+	"64": [
+		"arm64",
+		"x64"
+	]
+};
 
 module.exports = class Helper {
 	static OverwatchConstants = {
@@ -272,5 +296,19 @@ module.exports = class Helper {
 				}
 			}
 		}
+	}
+
+	static GetOSDir() {
+		let os = Object.keys(OS).find(k => OS[k].includes(process.platform));
+		let arch = Object.keys(ARCH).find(k => ARCH[k].includes(process.arch));
+		if (!os) {
+			throw new Error("Could not detect OS");
+		}
+
+		if (!arch && os !== "osx") {
+			throw new Error("Could not detect architecture");
+		}
+
+		return os + (os === "osx" ? "" : arch);
 	}
 };
