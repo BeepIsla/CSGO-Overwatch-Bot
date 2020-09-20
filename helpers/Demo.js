@@ -329,7 +329,7 @@ module.exports = class Demo {
 	}
 
 	findSuspect() {
-		this.suspectPlayer = this.demo.players.find(p => p.steam64Id === this.suspect64Id);
+		this.suspectPlayer = this.demo.players.find(p => p.userInfo && p.userInfo.xuid && p.userInfo.xuid.toString() === this.suspect64Id);
 		if (!this.suspectPlayer) {
 			return;
 		}
