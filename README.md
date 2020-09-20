@@ -29,7 +29,9 @@ NodeJS 12+ version
   - `username`: Your Steam account name
   - `password`: Your Steam password
   - `sharedSecret`: Optional shared secret to generate Mobile Steam Guard codes. Leave empty to enter manually.
+  - `saveSteamGuard`: Set to `true` to save login key between sessions - **This key bypasses Password and Steam Guard (Stored in `data/loginKey`)**
   - `invisible`: Set to `true` to show as offline on Steam
+  - `notifyXPReward`: Set to `true` to receive a notification if you've been granted the Overwatch XP Reward for submitting correct verdicts
 - `parsing`
   - `forceConvictOnPreviousBan`: When parsing is done the Suspect's Steam profile is checked for previous bans, if the previous ban is younger than this number of days it will forcefully convict the suspect for wallhack. Use `-1` to disable.
   - `minimumTime`: Minimum amount of time in seconds for parsing to take before sending verdict to CSGO. If too low CSGO will ignore our verdict.

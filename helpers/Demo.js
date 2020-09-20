@@ -2,8 +2,6 @@ const WorkerThreads = require("worker_threads");
 const path = require("path");
 const v8 = require("v8");
 
-// I know this is really badly done but its just for testing anyways
-
 module.exports = class Demo {
 	constructor(demoBuffer, steamID64, config) {
 		this.demoBuffer = demoBuffer;

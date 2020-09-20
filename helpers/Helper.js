@@ -5,6 +5,7 @@ const fetch = require("node-fetch");
 const unzipper = require("unzipper");
 const cheerio = require("cheerio");
 const Protobufs = require("./Protobufs.js");
+const XpBonusFlagsHelper = require("./XpBonusFlagsHelper.js");
 const BAN_REGEX = /(?<days>\d+)\s+day\(s\)\s+since\s+last\s+ban/;
 
 module.exports = class Helper {
@@ -41,6 +42,69 @@ module.exports = class Helper {
 			k_EMMV2OverwatchCasesType_Manual: 3,
 			k_EMMV2OverwatchCasesType_MLSuspicion: 4,
 			k_EMMV2OverwatchCasesType_Max: 5
+		}
+	};
+
+	static MatchmakingKickBanReason = {
+		// Via leaked CSGO Source Code
+		// Online repository: https://github.com/perilouswithadollarsign/cstrike15_src/blob/29e4c1fda9698d5cebcdaf1a0de4b829fa149bf8/game/shared/cstrike15/cstrike15_gcconstants.h#L428
+
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_VotedOff: 1,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_TKLimit: 2,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_TKSpawn: 3,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_DisconnectedTooLong: 4,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_Abandoned: 5,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_THLimit: 6,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_THSpawn: 7,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_OfficialBan: 8,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_KickedTooMuch: 9,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_ConvictedForCheating: 10,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_ConvictedForBehavior: 11,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_Abandoned_Grace: 12,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_DisconnectedTooLong_Grace: 13,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_ChallengeNotification: 14,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_NoUserSession: 15,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_FailedToConnect: 16,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_KickAbuse: 17,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_SkillGroupCalibration: 18,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_GsltViolation: 19,
+		k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_GsltViolation_Repeated: 20,
+
+		IsGlobal: function (eReason) {
+			switch (eReason) {
+				case this.k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_OfficialBan:
+				case this.k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_ConvictedForCheating:
+				case this.k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_ConvictedForBehavior:
+				case this.k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_ChallengeNotification:
+				case this.k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_GsltViolation:
+				case this.k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_GsltViolation_Repeated:
+				case this.k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_NoUserSession:
+					return true;
+				default:
+					return false;
+			}
+		},
+
+		IsPermanent: function (eReason) {
+			switch (eReason) {
+				case this.k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_OfficialBan:
+				case this.k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_ConvictedForCheating:
+				case this.k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_ChallengeNotification:
+					return true;
+				default:
+					return false;
+			}
+		},
+
+		IsGreen: function (eReason) {
+			switch (eReason) {
+				case this.k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_Abandoned_Grace:
+				case this.k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_DisconnectedTooLong_Grace:
+				case this.k_EMsgGCCStrike15_v2_MatchmakingKickBanReason_SkillGroupCalibration:
+					return true;
+				default:
+					return false;
+			}
 		}
 	};
 
@@ -181,5 +245,32 @@ module.exports = class Helper {
 		}
 
 		return Number(match.groups.days);
+	}
+
+	static GetXPFlags(caches) {
+		let protobufs = new Protobufs([
+			{
+				name: "csgo",
+				protos: [
+					path.join(__dirname, "..", "protobufs", "csgo", "base_gcmessages.proto")
+				]
+			}
+		]);
+
+		for (let cache of caches) {
+			for (let object of cache.objects) {
+				for (let objectData of object.object_data) {
+					if (object.type_id !== 7) {
+						// There are lots of types such as CSOEconItem, CSOPersonaDataPublic, CSOQuestProgress, etc...
+						// But we only care about "7" aka CSOEconGameAccountClient
+						continue;
+					}
+
+					let clientAccount = protobufs.decodeProto("CSOEconGameAccountClient", objectData);
+					let flags = XpBonusFlagsHelper.ParseBonusXPFlags(clientAccount.bonus_xp_usedflags);
+					return XpBonusFlagsHelper.StringifyFlags(flags);
+				}
+			}
+		}
 	}
 };

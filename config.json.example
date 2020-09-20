@@ -3,7 +3,9 @@
 		"username": "SteamUsername",
 		"password": "SteamPassword",
 		"sharedSecret": "",
-		"invisible": false
+		"saveSteamGuard": false,
+		"invisible": false,
+		"notifyXPReward": false
 	},
 	"parsing": {
 		"forceConvictOnPreviousBan": 3,

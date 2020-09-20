@@ -1,3 +1,27 @@
+# 2.5.0
+
+- Changed Overwatch XP reward notification to show between cases as well instead of only when logging in
+- Added errors when detecting an active cooldown
+- Added pausing when a new play session is started from another Steam client session
+  - Just click "Launch Anyway" on Steam and the bot will wait until you exit the game again
+
+# 2.4.0
+
+- Added option to notify about Overwatch XP reward
+- Fixed logging in with invalid loginKey causing process exit
+  - Now falls back to logging in without loginKey
+
+# 2.3.0
+
+- Added option to save login key to bypass Steam Guard for future logins ([#129](https://github.com/BeepIsla/CSGO-Overwatch-Bot/issues/129))
+- Fixed typo ([#131](https://github.com/BeepIsla/CSGO-Overwatch-Bot/pull/131))
+
+# 2.2.1
+
+- Potentially fixed rank fetching sometimes failing
+  - If everything fails will just assume we have access and attempt to get a case anyways
+- Fixed invisible mode ([#129](https://github.com/BeepIsla/CSGO-Overwatch-Bot/issues/129))
+
 # 2.2.0
 
 - Added invisible mode ([#116](https://github.com/BeepIsla/CSGO-Overwatch-Bot/issues/116))
