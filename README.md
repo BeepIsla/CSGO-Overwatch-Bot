@@ -53,7 +53,6 @@ NodeJS 12+ version
   - `printScoreboard`: Should we print a scoreboard with player statistics to console?
   - `logWithEmojis`: Should we print with emojis? Set to `false` to use "YES"/"NO" instead of "✔️"/"❌"
   - `maxVerdicts`: Maximum amount of Overwatch cases to do before stopping. `0` for unlimited.
-
   - `minAimbot`: Minimum amount of aimbot infractions required to convict for aimbotting
   - `minWallKills`: Minimum amount of kills through a wall required to convict for wallhacking
   - `minAFKing`: Minimum amount of rounds the suspect must be AFK for to count as griefing
