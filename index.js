@@ -467,6 +467,8 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 				process.exitCode = 1;
 			});
 		});
+		buffer = null;
+
 		if (!demoBuffer) {
 			return;
 		}
@@ -515,6 +517,8 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		}
 
 		let demo = new Demo(demoBuffer, sid.getSteamID64(), config);
+		demoBuffer = null;
+
 		let lastVal = 0;
 		demo.progressCallback  = (progressFraction) => {
 			let percentage = Math.round(progressFraction * 100);

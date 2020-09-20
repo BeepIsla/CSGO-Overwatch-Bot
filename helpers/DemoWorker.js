@@ -292,6 +292,7 @@ class Demo {
 
 			// Start parsing
 			this.demo.parse(this.buffer);
+			this.buffer = null;
 		});
 	}
 

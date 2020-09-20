@@ -73,6 +73,8 @@ new Promise((resolve, reject) => {
 		console.log("Parsing demo with suspect " + sid.getSteamID64());
 
 		let demo = new Demo(buffer, sid.getSteamID64(), config);
+		buffer = null;
+
 		let lastVal = 0;
 		demo.progressCallback = (progressFraction) => {
 			let percentage = Math.round(progressFraction * 100);

@@ -34,6 +34,7 @@ module.exports = class Demo {
 					config: this.config
 				}
 			});
+			this.demoBuffer = null;
 
 			worker.on("message", (msg) => {
 				switch (msg.type) {
