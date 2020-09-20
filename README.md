@@ -63,7 +63,9 @@ NodeJS 12+ version
 
 ## Steamworks
 
-**To use this you MUST install [node-gyp](https://github.com/nodejs/node-gyp#installation) and build tools**
+**To use this you MUST install [node-gyp](https://github.com/nodejs/node-gyp#installation) and build tools - For Windows check this checkbox when installing NodeJS:**
+
+<img src="https://i.imgur.com/VwqLGT4.png">
 
 You can use this bot without filling in `username` and `password`, simply run using `node index.js STEAMWORKS`. This will run like normal CSGO but without interface and solve Overwatch cases just like the normal bot, it does so by communicating with Steam the same way any Steam game does. You **must** have Steam running while using this.
 
