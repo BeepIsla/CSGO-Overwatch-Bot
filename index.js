@@ -23,6 +23,7 @@ let notifiedOfOverwatchBonusXP = false; // Only notify once per session at most
 let protobufs = undefined;
 let playStateBlocked = false;
 let loginPersonaCheck = false;
+let tempLoginKey = undefined;
 let casesCompleted = 0;
 let timings = {
 	Downloading: 0,
@@ -90,7 +91,7 @@ let timings = {
 		password: useLoginKey ? undefined : config.account.password,
 		twoFactorCode: useLoginKey ? undefined : (config.account.sharedSecret && config.account.sharedSecret.length > 5 ? SteamTotp.getAuthCode(config.account.sharedSecret) : undefined),
 		loginKey: useLoginKey ? keyData.loginKey : undefined,
-		rememberPassword: config.account.saveSteamGuard
+		rememberPassword: true
 	});
 })();
 
@@ -278,9 +279,14 @@ steam.on("appLaunched", async (appID) => {
 steam.on("disconnected", (eresult, msg) => {
 	console.log("Disconnected from Steam with EResult " + eresult + " and message " + msg);
 	process.exitCode = 1;
+
+	// Steam-User keeps the connection alive for a really long time some reason
+	setTimeout(() => process.exit, 1, 15 * 1000).unref();
 });
 
 steam.on("loginKey", (key) => {
+	tempLoginKey = key;
+
 	if (!config.account.saveSteamGuard) {
 		return;
 	}
@@ -319,14 +325,19 @@ steam.on("error", (err) => {
 				accountName: config.account.username,
 				password: config.account.password,
 				twoFactorCode: config.account.sharedSecret && config.account.sharedSecret.length > 5 ? SteamTotp.getAuthCode(config.account.sharedSecret) : undefined,
-				rememberPassword: config.account.saveSteamGuard
+				rememberPassword: true
 			});
 			break;
 		}
 		case 6: {
-			console.log("Another client started a game and kicked us off");
-			console.log("If you want the bot to automatically resume case solving you MUST follow the instructions in the README under \"Automatically pausing\"");
-			process.exit(1); // Error exit code for PM2 or similar to reboot
+			console.log("Another client started a game and kicked us off, logging back into Steam...");
+			steam.logOn({
+				accountName: config.account.username,
+				password: tempLoginKey ? undefined : config.account.password,
+				twoFactorCode: tempLoginKey ? undefined : (config.account.sharedSecret && config.account.sharedSecret.length > 5 ? SteamTotp.getAuthCode(config.account.sharedSecret) : undefined),
+				loginKey: tempLoginKey ? tempLoginKey : undefined,
+				rememberPassword: true
+			});
 			break;
 		}
 		default: {
