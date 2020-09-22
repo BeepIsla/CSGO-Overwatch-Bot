@@ -3,6 +3,7 @@
 - Changed Overwatch XP reward notification to show between cases as well instead of only when logging in
 - Added errors when detecting an active cooldown
 - Added pausing when a new play session is started from another Steam client session
+  - Follow the instructions in the README for it to work
   - Just click "Launch Anyway" on Steam and the bot will wait until you exit the game again
 
 # 2.4.0

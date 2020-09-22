@@ -325,6 +325,7 @@ steam.on("error", (err) => {
 		}
 		case 6: {
 			console.log("Another client started a game and kicked us off");
+			console.log("If you want the bot to automatically resume case solving you MUST follow the instructions in the README under \"Automatically pausing\"");
 			process.exit(1); // Error exit code for PM2 or similar to reboot
 			break;
 		}
