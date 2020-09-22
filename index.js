@@ -22,6 +22,7 @@ const notifications = []; // To be sent to console between cases
 let notifiedOfOverwatchBonusXP = false; // Only notify once per session at most
 let protobufs = undefined;
 let playStateBlocked = false;
+let loginPersonaCheck = false;
 let casesCompleted = 0;
 let timings = {
 	Downloading: 0,
@@ -96,7 +97,26 @@ let timings = {
 steam.on("loggedOn", () => {
 	console.log("Successfully logged into " + steam.steamID.toString());
 	steam.setPersona(config.account.invisible ? SteamUser.EPersonaState.Invisible : SteamUser.EPersonaState.Online);
+	loginPersonaCheck = false;
+});
 
+steam.on("user", (sid, user) => {
+	if (sid.accountid !== steam.steamID.accountid) {
+		return;
+	}
+
+	if (loginPersonaCheck) {
+		return;
+	}
+	loginPersonaCheck = true;
+
+	if (user.gameid !== "0") {
+		// Someone else is already playing
+		// No need to log here as "playingState" will emit as well
+		return;
+	}
+
+	// Nobody is currently playing on any session
 	steam.gamesPlayed([730]);
 });
 
@@ -292,17 +312,26 @@ steam.on("playingState", (blocked, playingApp) => {
 });
 
 steam.on("error", (err) => {
-	if (err.eresult !== 5) {
-		throw err;
+	switch (err.eresult) {
+		case 5: {
+			console.log("Login with saved loginKey failed. Logging in without loginKey...");
+			steam.logOn({
+				accountName: config.account.username,
+				password: config.account.password,
+				twoFactorCode: config.account.sharedSecret && config.account.sharedSecret.length > 5 ? SteamTotp.getAuthCode(config.account.sharedSecret) : undefined,
+				rememberPassword: config.account.saveSteamGuard
+			});
+			break;
+		}
+		case 6: {
+			console.log("Another client started a game and kicked us off");
+			process.exit(1); // Error exit code for PM2 or similar to reboot
+			break;
+		}
+		default: {
+			throw err;
+		}
 	}
-
-	console.log("Login with saved loginKey failed. Logging in without loginKey...");
-	steam.logOn({
-		accountName: config.account.username,
-		password: config.account.password,
-		twoFactorCode: config.account.sharedSecret && config.account.sharedSecret.length > 5 ? SteamTotp.getAuthCode(config.account.sharedSecret) : undefined,
-		rememberPassword: config.account.saveSteamGuard
-	});
 });
 
 coordinator.on("receivedFromGC", async (msgType, payload) => {
@@ -398,7 +427,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 			// We are blocked
 			return;
 		}
-	
+
 		if (!response || !response.ok) {
 			// Something failed while downloading - Tell the GC about it and abandon
 			console.error(new Error("Failed to download case. Check your internet connection"));
@@ -426,7 +455,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 			// We are blocked
 			return;
 		}
-	
+
 		console.log("Unpacking demo...");
 
 		timings.Unpacking = Date.now();
@@ -475,7 +504,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 			// We are blocked
 			return;
 		}
-	
+
 		timings.Unpacking = Date.now() - timings.Unpacking;
 
 		if (config.verdict.writeLog || config.verdict.backupDemo) {
@@ -549,7 +578,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 			// We are blocked
 			return;
 		}
-	
+
 		// Force convict?
 		if (typeof config.parsing.forceConvictOnPreviousBan === "number" && config.parsing.forceConvictOnPreviousBan >= 0) {
 			data.forceConvictEnabled = false;
