@@ -18,10 +18,11 @@ NodeJS 12+ version
 2. Download and extract this repository
 3. Open a command prompt inside the directory
 4. Run `npm ci`
-5. Make a duplicate of the `config.json.example` and remove the `.example`
-6. Adjust your now called `config.json` - [See Config](#config)
-7. Run `node index.js`
-8. After every update repeat from step 3
+5. Ignore any warnings
+6. Make a duplicate of the `config.json.example` and remove the `.example`
+7. Adjust your now called `config.json` - [See Config](#config)
+8. Run `node index.js` (Use without logging in - [Read more](#steamworks))
+9. After every update repeat from step 2
 
 ## Config
 
@@ -52,10 +53,19 @@ NodeJS 12+ version
   - `printScoreboard`: Should we print a scoreboard with player statistics to console?
   - `logWithEmojis`: Should we print with emojis? Set to `false` to use "YES"/"NO" instead of "✔️"/"❌"
   - `maxVerdicts`: Maximum amount of Overwatch cases to do before stopping. `0` for unlimited.
-
   - `minAimbot`: Minimum amount of aimbot infractions required to convict for aimbotting
   - `minWallKills`: Minimum amount of kills through a wall required to convict for wallhacking
   - `minAFKing`: Minimum amount of rounds the suspect must be AFK for to count as griefing
   - `minAntiAim`: Minimum amount of anti-aim infractions the suspect must have before convicting for other
   - `minTeamKills`: Minimum amount of team kills required to convict for griefing
   - `minTeamDamage`: Minimum amount of team damage required to convict for griefing
+
+## Steamworks
+
+**To use this you MUST install [node-gyp](https://github.com/nodejs/node-gyp#installation) and build tools - For Windows check this checkbox when installing NodeJS:**
+
+<img src="https://i.imgur.com/VwqLGT4.png">
+
+You can use this bot without filling in `username` and `password`, simply run using `node index.js STEAMWORKS`. This will run like normal CSGO but without interface and solve Overwatch cases just like the normal bot, it does so by communicating with Steam the same way any Steam game does. You **must** have Steam running while using this.
+
+Using this will **ignore** `username`, `password`, `sharedSecret`, `saveSteamGuard` and `invisible` in your config.

@@ -11,9 +11,14 @@ const Coordinator = require("./helpers/Coordinator.js");
 const Protobufs = require("./helpers/Protobufs.js");
 const Translate = require("./helpers/Translate.js");
 const Demo = require("./helpers/Demo.js");
+const Steamworks = require("./helpers/Steamworks.js");
 const config = require("./config.json");
+const USING_STEAMWORKS = process.argv.join(" ").toUpperCase().includes("STEAMWORKS");
+if (USING_STEAMWORKS) {
+	console.log("WARNING: Using Steamworks - This is experimental");
+}
 
-const steam = new SteamUser({
+const steam = USING_STEAMWORKS ? new Steamworks() : new SteamUser({
 	autoRelogin: false // Do not automatically log back in - Process must exit and an external program like PM2 must auto restart
 });
 const coordinator = new Coordinator(steam, 730);
@@ -30,6 +35,13 @@ let timings = {
 	Unpacking: 0,
 	Parsing: 0
 };
+
+process.on("SIGINT", () => {
+	console.log(USING_STEAMWORKS ? "Shutting down..." : "Logging off...");
+
+	steam.logOff();
+	setTimeout(process.exit, 1000, 0).unref();
+});
 
 (async () => {
 	console.log("Checking protobufs...");
