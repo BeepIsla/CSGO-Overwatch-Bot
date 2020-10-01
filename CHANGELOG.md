@@ -1,3 +1,9 @@
+# 2.6.0
+
+- Added Steamworks support - [Read more](https://github.com/BeepIsla/CSGO-Overwatch-Bot#steamworks)
+- Disabled AntiAim detector by default
+- When logging in now checks if another client is already playing something before starting and waits until the game is closed
+
 # 2.5.0
 
 - Changed Overwatch XP reward notification to show between cases as well instead of only when logging in
