@@ -1,0 +1,16 @@
+{
+  "name": "steam",
+  "description": "Steamworks native addon for the CSGO Overwatch bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "install": "node-gyp configure rebuild",
+    "postinstall": "node postinstall.js"
+  },
+  "keywords": [],
+  "author": "BeepIsla",
+  "license": "MIT",
+  "gypfile": true,
+  "dependencies": {},
+  "repository": {}
+}

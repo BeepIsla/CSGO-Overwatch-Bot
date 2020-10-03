@@ -1,14 +1,19 @@
 // This class name MUST be unique or it will override other results
-module.exports = class Wallhack {
+module.exports = class Griefing {
 	constructor(parent, config) {
 		this.parent = parent; // This is the object from "Demo.js"
 		this.config = config;
 
 		// Variables
 		this.infractions = [];
+		this.fireGrenades = [
+			"incgrenade",
+			"molotov"
+		];
 
 		// Register events
 		this.parent.demo.gameEvents.on("player_death", this.OnPlayerDeath.bind(this));
+		this.parent.demo.gameEvents.on("player_hurt", this.OnPlayerHurt.bind(this));
 	}
 
 	result() {
@@ -24,9 +29,10 @@ module.exports = class Wallhack {
 		*/
 		return {
 			aimbot: false,
-			wallhack: this.infractions.length >= this.config.verdict.minWallKills,
+			wallhack: false,
 			speedhack: false,
-			teamharm: false
+			teamharm: this.infractions.filter(i => i.type === "death").length >= this.config.verdict.minTeamKills || // Suspect killed someone "maxTeamKills" amount of times
+				this.infractions.reduce((prev, cur) => prev + (cur.type === "damage" ? cur.damage : 0), 0) >= this.config.verdict.minTeamDamage // Suspect did "maxTeamDamage" damage
 		};
 	}
 
@@ -42,22 +48,37 @@ module.exports = class Wallhack {
 	 * Custom Methods *
 	 ******************/
 	OnPlayerDeath(ev) {
+		let victim = this.parent.demo.entities.getByUserId(ev.userid);
 		let attacker = this.parent.demo.entities.getByUserId(ev.attacker);
-		if (!attacker || attacker.steam64Id !== this.parent.suspect64Id) {
-			return; // Attacker no longer available or not our suspect
-		}
-
-		if (ev.penetrated <= 0 && !ev.thrusmoke && !ev.attackerblind) {
-			// Nothing suspicious
+		if (!victim || !attacker || victim === attacker || attacker.steam64Id !== this.parent.suspect64Id) {
 			return;
 		}
 
-		// Log this
+		if (!attacker.isFriendly(victim) || this.fireGrenades.includes(ev.weapon)) {
+			return;
+		}
+
 		this.infractions.push({
 			tick: this.parent.demo.currentTick,
-			penetrated: ev.penetrated,
-			smokebang: ev.thrusmoke,
-			blind: ev.attackerblind
+			type: "death"
+		});
+	}
+
+	OnPlayerHurt(ev) {
+		let victim = this.parent.demo.entities.getByUserId(ev.userid);
+		let attacker = this.parent.demo.entities.getByUserId(ev.attacker);
+		if (!victim || !attacker || victim === attacker || attacker.steam64Id !== this.parent.suspect64Id) {
+			return;
+		}
+
+		if (!attacker.isFriendly(victim) || this.fireGrenades.includes(ev.weapon)) {
+			return;
+		}
+
+		this.infractions.push({
+			tick: this.parent.demo.currentTick,
+			type: "damage",
+			damage: ev.dmg_health
 		});
 	}
 };

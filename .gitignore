@@ -6,4 +6,12 @@ config.json
 test.js
 manualLogin.js
 cases
-.idea
+data
+extension/steam/build
+extension/steam/steam_api*dll
+extension/steam/sdk/*
+extension/steam/sdk/public/steam/lib
+extension/steam/sdk/public/steam/*.json
+extension/steam/sdk/redistributable_bin/**/steam_api*.lib
+!extension/steam/sdk/public
+!extension/steam/sdk/redistributable_bin

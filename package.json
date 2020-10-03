@@ -1,6 +1,6 @@
 {
   "name": "csgo-overwatch-bot",
-  "version": "1.3.3",
+  "version": "2.6.0",
   "description": "",
   "repository": {
     "type": "git",
@@ -11,20 +11,30 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "github.com/BeepIsla",
+  "author": "BeepIsla",
   "license": "AGPL-3.0",
   "dependencies": {
     "almost-equal": "^1.1.0",
     "bytebuffer": "^5.0.1",
-    "demofile": "^1.0.6",
-    "inquirer": "^6.2.2",
-    "protobufjs": "^6.8.8",
-    "request": "^2.88.0",
-    "steam-totp": "^2.1.0",
-    "steam-user": "^4.15.3",
-    "steamid": "^1.1.0",
-    "unbzip2-stream": "^1.3.1",
-    "unzipper": "^0.10.1",
-    "vdf": "0.0.2"
+    "cheerio": "^1.0.0-rc.3",
+    "cli-table3": "^0.6.0",
+    "colors": "^1.4.0",
+    "demofile": "^1.5.0",
+    "inquirer": "^7.3.3",
+    "node-fetch": "^2.6.1",
+    "protobufjs": "^6.10.1",
+    "steam-totp": "^2.1.1",
+    "steam-user": "^4.18.0",
+    "steamid": "^1.1.3",
+    "unbzip2-stream": "^1.4.3",
+    "unzipper": "^0.10.11",
+    "vdf-parser": "^1.1.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.8.1"
+  },
+  "optionalDependencies": {
+    "steam": "file:extension/steam"
   }
 }
