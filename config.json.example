@@ -32,10 +32,10 @@
 		"logWithEmojis": true,
 		"maxVerdicts": 0,
 
-		"minAimbot": 10,
+		"minAimbot": 15,
 		"minWallKills": 5,
 		"minAFKing": 5,
-		"minAntiAim": 10,
+		"minAntiAim": 50,
 		"minTeamKills": 2,
 		"minTeamDamage": 150
 	}
