@@ -1,3 +1,10 @@
+# 2.6.1
+
+- AA detector no longer ignores between-rounds and warmup ([#153](https://github.com/BeepIsla/CSGO-Overwatch-Bot/pull/153))
+- Aimbot now checks angles when a player is damaged rather than when they die ([#155](https://github.com/BeepIsla/CSGO-Overwatch-Bot/pull/155))
+- Fixed Steamworks not working ([#150](https://github.com/BeepIsla/CSGO-Overwatch-Bot/issues/150))
+- Re-enabled AntiAim detector by default
+
 # 2.6.0
 
 - Added Steamworks support - [Read more](https://github.com/BeepIsla/CSGO-Overwatch-Bot#steamworks)

@@ -6,13 +6,9 @@ module.exports = class AntiAim {
 
 		// Variables
 		this.infractions = [];
-		this.isActiveRound = false;
 
 		// Register events
 		this.parent.demo.on("tickend", this.OnTickEnd.bind(this));
-		this.parent.demo.gameEvents.on("round_freeze_end", this.OnRoundFreezeEnd.bind(this));
-		this.parent.demo.gameEvents.on("round_end", this.OnRoundEnd.bind(this));
-		this.parent.demo.gameEvents.on("round_start", this.OnRoundEnd.bind(this)); // Does the same as above, no need for 2 event handlers doing the same thing
 	}
 
 	result() {
@@ -46,10 +42,8 @@ module.exports = class AntiAim {
 	 * Custom Methods *
 	 ******************/
 	OnTickEnd(tick) {
-		if (!this.parent.suspectPlayer || !this.parent.suspectPlayer.isAlive || !this.isActiveRound ||
-			this.parent.demo.gameRules.getProp("DT_CSGameRules", "m_bWarmupPeriod")
-		) {
-			// Suspect left, is dead, round is not active or in warmup
+		if (!this.parent.suspectPlayer || !this.parent.suspectPlayer.isAlive) {
+			// Suspect left or is dead
 			return;
 		}
 
@@ -59,25 +53,20 @@ module.exports = class AntiAim {
 		// ! this detector can say what he have AntiAim (AA)... need more tests!
 		// ? Idea: https://www.unknowncheats.me/forum/counterstrike-global-offensive/208735-detecting-player-antiaim.html
 		const m_flLowerBodyYawTarget = this.parent.suspectPlayer.getProp("DT_CSPlayer", "m_flLowerBodyYawTarget");
-		const lbyDelta = m_flLowerBodyYawTarget - this.parent.suspectPlayer.eyeAngles.yaw;
-		if (lbyDelta <= 40 || this.parent.suspectPlayer.eyeAngles.pitch !== 0) {
+		const eyeAngles = this.parent.suspectPlayer.eyeAngles;
+		const lbyDelta = m_flLowerBodyYawTarget - eyeAngles.yaw;
+		if (lbyDelta <= 40 || eyeAngles.pitch !== 0 || eyeAngles.yaw !== 0) {
+			// ? if I didn't check yaw I get false positive sometimes. 
+			// ? but in rage cheater what really have AA detects didn't increase or decrease
 			// All good
 			return;
 		}
 
 		this.infractions.push({
 			tick: this.parent.demo.currentTick,
-			angles: this.parent.suspectPlayer.eyeAngles,
+			angles: eyeAngles,
 			lowerBodyYaw: m_flLowerBodyYawTarget,
 			lowerBodyDelta: lbyDelta
 		});
-	}
-
-	OnRoundFreezeEnd(ev) {
-		this.isActiveRound = true;
-	}
-
-	OnRoundEnd(ev) {
-		this.isActiveRound = false;
 	}
 };

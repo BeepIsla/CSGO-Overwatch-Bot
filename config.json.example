@@ -23,7 +23,7 @@
 		"Wallhack": true,
 		"Griefing": true,
 		"AFKing": true,
-		"AntiAim": false
+		"AntiAim": true
 	},
 	"verdict": {
 		"writeLog": true,
@@ -32,10 +32,10 @@
 		"logWithEmojis": true,
 		"maxVerdicts": 0,
 
-		"minAimbot": 10,
+		"minAimbot": 15,
 		"minWallKills": 5,
 		"minAFKing": 5,
-		"minAntiAim": 10,
+		"minAntiAim": 20,
 		"minTeamKills": 2,
 		"minTeamDamage": 150
 	}

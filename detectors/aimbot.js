@@ -12,7 +12,7 @@ module.exports = class Aimbot {
 
 		// Register events
 		this.parent.demo.on("tickend", this.OnTickEnd.bind(this));
-		this.parent.demo.gameEvents.on("player_death", this.OnPlayerDeath.bind(this));
+		this.parent.demo.gameEvents.on("player_hurt", this.OnPlayerHurt.bind(this));
 	}
 
 	result() {
@@ -57,7 +57,7 @@ module.exports = class Aimbot {
 		}
 	}
 
-	OnPlayerDeath(ev) {
+	OnPlayerHurt(ev) {
 		let attacker = this.parent.demo.entities.getByUserId(ev.attacker);
 		if (!attacker || attacker.steam64Id !== this.parent.suspect64Id) {
 			return; // Attacker no longer available or not our suspect
