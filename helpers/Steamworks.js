@@ -90,7 +90,7 @@ module.exports = class Steamworks extends Events.EventEmitter {
 
 		this.emit("loggedOn");
 		this.emit("user", this.steamID, {
-			gameIid: "0"
+			gameid: "0"
 		});
 	}
 
