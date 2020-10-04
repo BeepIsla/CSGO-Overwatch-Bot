@@ -23,7 +23,7 @@
 		"Wallhack": true,
 		"Griefing": true,
 		"AFKing": true,
-		"AntiAim": false
+		"AntiAim": true
 	},
 	"verdict": {
 		"writeLog": true,
