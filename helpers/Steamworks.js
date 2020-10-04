@@ -89,6 +89,9 @@ module.exports = class Steamworks extends Events.EventEmitter {
 		process.chdir(oldDir);
 
 		this.emit("loggedOn");
+		this.emit("user", this.steamID, {
+			gameIid: "0"
+		});
 	}
 
 	logOff() {
