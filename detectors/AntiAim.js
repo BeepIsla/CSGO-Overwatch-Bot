@@ -25,7 +25,7 @@ module.exports = class AntiAim {
 		return {
 			aimbot: false,
 			wallhack: false,
-			speedhack: this.infractions.length >= this.config.verdict.minAntiAim,
+			speedhack: false, // this.infractions.length >= this.config.verdict.minAntiAim,
 			teamharm: false
 		};
 	}
