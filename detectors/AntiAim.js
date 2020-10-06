@@ -66,7 +66,6 @@ module.exports = class AntiAim {
 		this.infractions.push(
 			{
 				tick: tick,
-				currTick: this.parent.demo.currentTick,
 				angles: { pitch, yaw },
 				isLookAtDown: lookAtDown(pitch),
 				// isLookAtUp: lookAtUp(eyeAngles.pitch)
