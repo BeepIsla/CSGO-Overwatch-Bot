@@ -35,7 +35,7 @@
 		"minAimbot": 15,
 		"minWallKills": 5,
 		"minAFKing": 5,
-		"minAntiAim": 20,
+		"minAntiAim": 1000,
 		"minTeamKills": 2,
 		"minTeamDamage": 150
 	}
