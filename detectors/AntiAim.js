@@ -46,11 +46,7 @@ module.exports = class AntiAim {
 			// Suspect left or is dead or warmup
 			return;
 		}
-		const cheatAngle = 88.99;
-		// Angles are hardcoded
-		// Currently only one angle I have. 
-		// ! Need more tests and more angles (?)
-		// ? Note: If that method wouldn't work success for >= 30% of cheaters (with AA) we should delete this.
+		const cheatAngle = 88.99; // This angles always have in a lot of AA cheaters.
 		const { pitch, yaw } = this.parent.suspectPlayer.eyeAngles;
 
 		const lookAtDown = (value) => parseFloat(value.toFixed(2), 10) === cheatAngle;
