@@ -6,7 +6,6 @@ module.exports = class AnglesCheck_LegitAA {
 
 		// Variables
 		this.infractions = [];
-		this.parent.stats = {};
 
 		// Register events
 		this.parent.demo.on("tickend", this.OnTickEnd.bind(this));
