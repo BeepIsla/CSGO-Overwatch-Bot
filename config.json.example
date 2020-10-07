@@ -23,7 +23,8 @@
 		"Wallhack": true,
 		"Griefing": true,
 		"AFKing": true,
-		"AntiAim": true
+		"AnglesCheck_AA": true,
+		"AnglesCheck_LegitAA": true
 	},
 	"verdict": {
 		"writeLog": true,
@@ -35,7 +36,8 @@
 		"minAimbot": 15,
 		"minWallKills": 5,
 		"minAFKing": 5,
-		"minAntiAim": 1000,
+		"minAnglesCheck": 1000,
+		"minAnglesCheck_LegitAA": 500,
 		"minTeamKills": 2,
 		"minTeamDamage": 150
 	}
