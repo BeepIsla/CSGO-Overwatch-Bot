@@ -110,9 +110,7 @@ module.exports = class AnglesCheck_LegitAA {
 		this.infractions.push(
 			{
 				tick: tick,
-				angles: { pitch, yaw },
-				bodyYaw: this.parent.suspectPlayer.props.DT_CSPlayer.m_flLowerBodyYawTarget,
-				lbyYaw: this.parent.suspectPlayer.props.DT_CSPlayer.m_flLowerBodyYawTarget - yaw >= 0 ? this.parent.suspectPlayer.props.DT_CSPlayer.m_flLowerBodyYawTarget - yaw : this.parent.suspectPlayer.props.DT_CSPlayer.m_flLowerBodyYawTarget + yaw,
+				angles: { pitch, yaw }
 			}
 		);
 	}
