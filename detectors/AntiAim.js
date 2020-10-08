@@ -42,31 +42,31 @@ module.exports = class AntiAim {
 	 * Custom Methods *
 	 ******************/
 	OnTickEnd(tick) {
-		if (!this.parent.suspectPlayer || !this.parent.suspectPlayer.isAlive) {
-			// Suspect left or is dead
+		// todo: add checks if player jump, in air, freeze period etc
+		if (!this.parent.suspectPlayer || !this.parent.suspectPlayer.isAlive || this.parent.demo.gameRules.isWarmup) {
+			// Suspect left or is dead or warmup
 			return;
 		}
 
-		// Check if player look at floor and check angles
-		// ! Be aware. This detector is unstable. 
-		// ! I don't sure by 100%, but if player just look at floor (0deg) and didn't kill anybody
-		// ! this detector can say what he have AntiAim (AA)... need more tests!
-		// ? Idea: https://www.unknowncheats.me/forum/counterstrike-global-offensive/208735-detecting-player-antiaim.html
-		const m_flLowerBodyYawTarget = this.parent.suspectPlayer.getProp("DT_CSPlayer", "m_flLowerBodyYawTarget");
-		const eyeAngles = this.parent.suspectPlayer.eyeAngles;
-		const lbyDelta = m_flLowerBodyYawTarget - eyeAngles.yaw;
-		if (lbyDelta <= 40 || eyeAngles.pitch !== 0 || eyeAngles.yaw !== 0) {
-			// ? if I didn't check yaw I get false positive sometimes. 
-			// ? but in rage cheater what really have AA detects didn't increase or decrease
-			// All good
+		const { pitch, yaw } = this.parent.suspectPlayer.eyeAngles;
+
+		const lookAtDown = (value) => parseFloat(value.toFixed(2), 10) === 88.99;
+		// const lookAtUp = (value) => parseFloat(value.toFixed(2), 10) === -88.99;
+		// ? note: Cheaters have AA what look at up but I didn't test it so I disable this check. I need more demos.
+		// ! note: A lot of cheaters use only one or two types of Rage AA. This method good work currently.  
+
+		if (!lookAtDown(pitch)) {
+			// Player or Cheater did't look at floor (down)
 			return;
 		}
 
-		this.infractions.push({
-			tick: this.parent.demo.currentTick,
-			angles: eyeAngles,
-			lowerBodyYaw: m_flLowerBodyYawTarget,
-			lowerBodyDelta: lbyDelta
-		});
+		this.infractions.push(
+			{
+				tick: tick,
+				angles: { pitch, yaw },
+				// isLookAtDown: lookAtDown(pitch),
+				// isLookAtUp: lookAtUp(eyeAngles.pitch)
+			}
+		);
 	}
 };
