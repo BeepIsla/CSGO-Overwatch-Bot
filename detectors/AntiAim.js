@@ -42,11 +42,11 @@ module.exports = class AntiAim {
 	 * Custom Methods *
 	 ******************/
 	OnTickEnd(tick) {
-		// todo: add checks if player jump, in air, freeze period etc
-		if (!this.parent.suspectPlayer || !this.parent.suspectPlayer.isAlive || this.parent.demo.gameRules.isWarmup) {
-			// Suspect left or is dead or warmup
-			return;
-		}
+		// todo: add checks if player jump, in air, ~~freeze period~~ etc
+		if (!this.parent.suspectPlayer
+			|| !this.parent.suspectPlayer.isAlive
+			|| this.parent.demo.gameRules.isWarmup
+                        || this.parent.demo.gameRules.props.DT_CSGameRules.m_bFreezePeriod) return; // Suspect left or is dead or warmup or freeze period
 
 		const { pitch, yaw } = this.parent.suspectPlayer.eyeAngles;
 
@@ -55,10 +55,7 @@ module.exports = class AntiAim {
 		// ? note: Cheaters have AA what look at up but I didn't test it so I disable this check. I need more demos.
 		// ! note: A lot of cheaters use only one or two types of Rage AA. This method good work currently.  
 
-		if (!lookAtDown(pitch)) {
-			// Player or Cheater did't look at floor (down)
-			return;
-		}
+		if (!lookAtDown(pitch)) return; // Player or Cheater did't look at floor (down)
 
 		this.infractions.push(
 			{
