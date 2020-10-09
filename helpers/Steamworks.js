@@ -36,7 +36,7 @@ module.exports = class Steamworks extends Events.EventEmitter {
 			let msgType = data.msgType & ~PROTO_MASK;
 
 			this.emit("receivedFromGC", 730, msgType, buf);
-		}, 10).unref();
+		}, 10);
 	}
 
 	async logOn(details) {
@@ -89,6 +89,9 @@ module.exports = class Steamworks extends Events.EventEmitter {
 		process.chdir(oldDir);
 
 		this.emit("loggedOn");
+		this.emit("user", this.steamID, {
+			gameid: "0"
+		});
 	}
 
 	logOff() {

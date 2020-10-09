@@ -182,6 +182,7 @@ namespace Steam
 		NODE_SET_METHOD(exports, "Init", Init);
 		NODE_SET_METHOD(exports, "Shutdown", Shutdown);
 		NODE_SET_METHOD(exports, "GetSteamID", GetSteamID);
+		NODE_SET_METHOD(exports, "SetRichPresence", SetRichPresence);
 		NODE_SET_METHOD(exports, "IsMessageAvailable", IsMessageAvailable);
 		NODE_SET_METHOD(exports, "RetrieveMessage", RetrieveMessage);
 		NODE_SET_METHOD(exports, "SendMessage", SendMessage);
