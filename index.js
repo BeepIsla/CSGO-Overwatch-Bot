@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 const Stream = require("stream");
-const SteamUser = require("steam-user");
 const SteamTotp = require("steam-totp");
 const SteamID = require("steamid");
 const unbzip2 = require("unbzip2-stream");
@@ -12,15 +11,14 @@ const Protobufs = require("./helpers/Protobufs.js");
 const Translate = require("./helpers/Translate.js");
 const Demo = require("./helpers/Demo.js");
 const Steamworks = require("./helpers/Steamworks.js");
+const SteamUser = require("./helpers/SteamUser.js");
 const config = require("./config.json");
 const USING_STEAMWORKS = process.argv.join(" ").toUpperCase().includes("STEAMWORKS");
 if (USING_STEAMWORKS) {
 	console.log("WARNING: Using Steamworks - This is experimental");
 }
 
-const steam = USING_STEAMWORKS ? new Steamworks() : new SteamUser({
-	autoRelogin: false // Do not automatically log back in - Process must exit and an external program like PM2 must auto restart
-});
+const steam = USING_STEAMWORKS ? new Steamworks() : new SteamUser();
 const coordinator = new Coordinator(steam, 730);
 const objectHandler = {};
 const notifications = []; // To be sent to console between cases
