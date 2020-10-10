@@ -23,7 +23,7 @@
 		"Wallhack": true,
 		"Griefing": true,
 		"AFKing": true,
-		"AntiAim": true
+		"LBYDeltaChecker": true
 	},
 	"verdict": {
 		"writeLog": true,
@@ -35,7 +35,7 @@
 		"minAimbot": 15,
 		"minWallKills": 5,
 		"minAFKing": 5,
-		"minAntiAim": 20,
+		"minLBYDeltaChecker": 1000,
 		"minTeamKills": 2,
 		"minTeamDamage": 150
 	}
