@@ -1,3 +1,9 @@
+# 2.6.2
+
+- Added worker process for Steam to prevent unwanted disconnects
+- Temporarily disabled AA detector by default
+- Fixed SteamWorks implementation
+
 # 2.6.1
 
 - AA detector no longer ignores between-rounds and warmup ([#153](https://github.com/BeepIsla/CSGO-Overwatch-Bot/pull/153))
