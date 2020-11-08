@@ -600,7 +600,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 			// We are blocked
 			return;
 		}
-
+		console.log("Map: " + data.map);
 		// Force convict?
 		if (typeof config.parsing.forceConvictOnPreviousBan === "number" && config.parsing.forceConvictOnPreviousBan >= 0) {
 			data.forceConvictEnabled = false;
