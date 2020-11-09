@@ -1,3 +1,10 @@
+# 2.6.3
+
+- Added more logs such as map, server, version, etc
+- The demo header is now included when `writeLog` is enabled
+- No longer tries to parse demos pre-2020 ([#178](https://github.com/BeepIsla/CSGO-Overwatch-Bot/issues/178))
+  - These demos are too old to be parsed by the libary so instead we just wait 90 minutes for the case to get dropped
+
 # 2.6.2
 
 - Added worker process for Steam to prevent unwanted disconnects
