@@ -565,6 +565,12 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 			].join("\n"));
 		}
 
+		let header = demofile.parseHeader(demoBuffer);
+		console.log("-      Server: " + header.serverName);
+		console.log("-     Version: " + header.networkProtocol);
+		console.log("-         Map: " + header.mapName);
+		console.log("-      Length: " + Helper.FormatSeconds(header.playbackTime) + "m");
+
 		let demo = new Demo(demoBuffer, sid.getSteamID64(), config);
 		let lastVal = 0;
 		demo.demo.on("progress", (progressFraction) => {

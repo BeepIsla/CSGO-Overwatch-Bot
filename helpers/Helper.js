@@ -313,4 +313,18 @@ module.exports = class Helper {
 
 		return os + (os === "osx" ? "" : arch);
 	}
+
+	static FormatSeconds(secs) {
+		let mins = Math.floor(secs / 60);
+		if (mins < 10) {
+			mins = "0" + mins;
+		}
+
+		secs = Math.floor(secs % 60);
+		if (secs < 10) {
+			secs = "0" + secs;
+		}
+
+		return mins + ":" + secs;
+	}
 };
