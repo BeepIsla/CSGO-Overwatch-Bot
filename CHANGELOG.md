@@ -1,3 +1,10 @@
+# 2.6.4
+
+- Updated libraries
+- Changed waiting 90 minutes to use Valve provided time for pre-2020 demos
+- Fixed scoreboard sometimes showing wrong numbers ([#170]([#170](https://github.com/BeepIsla/CSGO-Overwatch-Bot/issues/170)))
+- Fixed crash when cache data is missing
+
 # 2.6.3
 
 - Added more logs such as map, server, version, etc
