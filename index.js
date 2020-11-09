@@ -583,7 +583,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 
 			// Stop playing and later start playing again - The "appLaunched" event should fire again
 			steam.gamesPlayed([]);
-			await new Promise(p => setTimeout(p, 90 * 60 * 1000));
+			await new Promise(p => setTimeout(p, 90 * 60 * 1000).unref());
 			steam.gamesPlayed([730]);
 			return;
 		}
