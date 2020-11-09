@@ -163,7 +163,7 @@ steam.on("appLaunched", async (appID) => {
 
 			// Parse response and get flags from it
 			welcome = protobufs.decodeProto("CMsgClientWelcome", welcome);
-			let flags = Helper.GetXPFlags(welcome.outofdate_subscribed_caches);
+			let flags = Helper.GetXPFlags(welcome.outofdate_subscribed_caches || []);
 
 			// The above parses various things but we only care about the Overwatch one so ignore everything else
 			for (let flag of flags) {
