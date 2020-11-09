@@ -567,10 +567,10 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		}
 
 		let header = demofile.parseHeader(demoBuffer);
-		console.log("-      Server: " + header.serverName);
-		console.log("-     Version: " + header.networkProtocol);
-		console.log("-         Map: " + header.mapName);
-		console.log("-      Length: " + Helper.FormatSeconds(header.playbackTime) + "m");
+		console.log("-  Server: " + header.serverName);
+		console.log("- Version: " + header.networkProtocol);
+		console.log("-     Map: " + header.mapName);
+		console.log("-  Length: " + Helper.FormatSeconds(header.playbackTime) + "m");
 
 		if (header.networkProtocol < 13700) {
 			// Arbitrary number, no idea at which version it works
