@@ -598,6 +598,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		if (!data) {
 			return;
 		}
+		data.header = header;
 
 		process.stdout.write("\n");
 		timings.Parsing = Date.now() - timings.Parsing;
