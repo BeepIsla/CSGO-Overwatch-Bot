@@ -296,6 +296,8 @@ module.exports = class Helper {
 				}
 			}
 		}
+
+		return [];
 	}
 
 	static GetOSDir() {
