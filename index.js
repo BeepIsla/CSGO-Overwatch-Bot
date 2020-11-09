@@ -5,6 +5,7 @@ const SteamTotp = require("steam-totp");
 const SteamID = require("steamid");
 const unbzip2 = require("unbzip2-stream");
 const cliTable = require("cli-table3");
+const demofile = require("demofile");
 const Helper = require("./helpers/Helper.js");
 const Coordinator = require("./helpers/Coordinator.js");
 const Protobufs = require("./helpers/Protobufs.js");
@@ -570,6 +571,22 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		console.log("-     Version: " + header.networkProtocol);
 		console.log("-         Map: " + header.mapName);
 		console.log("-      Length: " + Helper.FormatSeconds(header.playbackTime) + "m");
+
+		if (header.networkProtocol < 13700) {
+			// Arbitrary number, no idea at which version it works
+			console.log("");
+			console.log("Detected demo from pre-2020. These type of demos are not parsable. The bot will now wait 90 minutes for the case to disappear.");
+			console.log("NOTE: Starting CSGO during this time might restart the 90 minute timer.");
+			console.log("");
+			console.log("Current time: " + new Date().toLocaleString());
+			console.log("Will continue at: " + new Date(Date.now() + 90 * 60 * 1000).toLocaleString());
+
+			// Stop playing and later start playing again - The "appLaunched" event should fire again
+			steam.gamesPlayed([]);
+			await new Promise(p => setTimeout(p, 90 * 60 * 1000));
+			steam.gamesPlayed([730]);
+			return;
+		}
 
 		let demo = new Demo(demoBuffer, sid.getSteamID64(), config);
 		let lastVal = 0;
