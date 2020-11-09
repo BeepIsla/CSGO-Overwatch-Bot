@@ -572,18 +572,21 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		console.log("-     Map: " + header.mapName);
 		console.log("-  Length: " + Helper.FormatSeconds(header.playbackTime) + "m");
 
+		// Arbitrary number, no idea at which version it works
 		if (header.networkProtocol < 13700) {
-			// Arbitrary number, no idea at which version it works
+			// Use provided time by Valve (Usually 90 minutes) or just fallback to 90
+			let waitMins = body.throttleseconds ? (body.throttleseconds / 60) : 90;
+
 			console.log("");
-			console.log("Detected demo from pre-2020. These type of demos are not parsable. The bot will now wait 90 minutes for the case to disappear.");
-			console.log("NOTE: Starting CSGO during this time might restart the 90 minute timer.");
+			console.log("Detected demo from pre-2020. These type of demos are not parsable. The bot will now wait " + waitMins + " minute" + (waitMins === 1 ? "" : "s") + " for the case to disappear.");
+			console.log("NOTE: Starting CSGO during this time might restart the " + waitMins + " minute timer.");
 			console.log("");
 			console.log("Current time: " + new Date().toLocaleString());
-			console.log("Will continue at: " + new Date(Date.now() + 90 * 60 * 1000).toLocaleString());
+			console.log("Will continue at: " + new Date(Date.now() + waitMins * 60 * 1000).toLocaleString());
 
 			// Stop playing and later start playing again - The "appLaunched" event should fire again
 			steam.gamesPlayed([]);
-			await new Promise(p => setTimeout(p, 90 * 60 * 1000).unref());
+			await new Promise(p => setTimeout(p, waitMins * 60 * 1000).unref());
 			steam.gamesPlayed([730]);
 			return;
 		}
