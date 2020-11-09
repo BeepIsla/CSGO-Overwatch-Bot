@@ -200,7 +200,9 @@ module.exports = class Demo {
 				});
 			});
 
-			this.demo.gameEvents.on("round_officially_ended", this.updateScoreboard.bind(this));
+			this.demo.gameEvents.on("round_officially_ended", this.updateScoreboard.bind(this, true));
+			this.demo.gameEvents.on("player_disconnect", this.updateScoreboard.bind(this, false));
+			this.demo.gameEvents.on("round_end", this.updateScoreboard.bind(this, false));
 
 			// Parse suspect information
 			this.demo.gameEvents.on("player_disconnect", this.findSuspect.bind(this));
@@ -337,10 +339,10 @@ module.exports = class Demo {
 		this.suspectPlayer.arrayIndex = Helper.ShiftNumber(this.suspectPlayer.index);
 	}
 
-	updateScoreboard() {
+	updateScoreboard(isRoundEndUpdate) {
 		// If this is half time swap all existing players "teamNumber"
 		let mp_maxrounds = Number(this.demo.conVars.vars.get("mp_maxrounds"));
-		if (this.demo.gameRules.roundsPlayed === (mp_maxrounds / 2)) {
+		if (isRoundEndUpdate && this.demo.gameRules.roundsPlayed === (mp_maxrounds / 2)) {
 			// While the "Update all players" below resets this due to you still being on your
 			// old team during the 15 seconds of halftime we have to do this for disconnected players
 			// If you disconnect round 12 and don't reconnect it would never update your "teamNumber" again
