@@ -10,7 +10,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "steam": "node index.js STEAMWORKS"
+    "steam": "node index.js STEAMWORKS",
+    "demo": "node force.js"
   },
   "keywords": [],
   "author": "BeepIsla",
