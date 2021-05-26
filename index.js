@@ -591,7 +591,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 			return;
 		}
 
-		let demo = new Demo(demoBuffer, sid.getSteamID64(), config);
+		let demo = new Demo(demoBuffer, sid.getSteamID64(), config, body);
 		let lastVal = 0;
 		demo.demo.on("progress", (progressFraction) => {
 			let percentage = Math.round(progressFraction * 100);
@@ -679,8 +679,21 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		}
 
 		// Wait a minimum amount of time
-		if (timeTotal < (config.parsing.minimumTime * 1000)) {
-			let diff = (config.parsing.minimumTime * 1000) - timeTotal;
+		let waitTimeMinimum = -1;
+		if (config.parsing.waitCalculatedDemoTime) {
+			// Calculate time we need to wait
+			let speedyTicks = demo.timings.suspectDead + demo.timings.freezeTime;
+			let normalTicks = demo.timings.totalTicksForWatching - speedyTicks;
+			let speedMultiplier = 10; // Same as "demo_highlight_fastforwardspeed"
+
+			let ticksToWatch = (speedyTicks / speedMultiplier) + normalTicks;
+			waitTimeMinimum = ticksToWatch * (1 / demo.snapshotrate); // Same as "tv_snapshotrate"
+		} else if (timeTotal < (config.parsing.minimumTime * 1000)) {
+			waitTimeMinimum = config.parsing.minimumTime;
+		}
+
+		if (waitTimeMinimum > 0) {
+			let diff = (waitTimeMinimum * 1000) - timeTotal;
 			let rawSeconds = Math.ceil(diff / 1000);
 
 			let seconds = rawSeconds % 60;

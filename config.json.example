@@ -10,6 +10,7 @@
 	"parsing": {
 		"forceConvictOnPreviousBan": 3,
 		"minimumTime": 240,
+		"waitCalculatedDemoTime": true,
 		"aimbot": {
 			"maxTicks": 10,
 			"threshold": 1.0

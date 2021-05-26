@@ -36,6 +36,7 @@ NodeJS 12+ version
 - `parsing`
   - `forceConvictOnPreviousBan`: When parsing is done the Suspect's Steam profile is checked for previous bans, if the previous ban is younger than this number of days it will forcefully convict the suspect for wallhack. Use `-1` to disable.
   - `minimumTime`: Minimum amount of time in seconds for parsing to take before sending verdict to CSGO. If too low CSGO will ignore our verdict.
+  - `waitCalculatedDemoTime`: If `true` will ignore `minimumTime` and instead will wait the calculated length of the Overwatch case
   - `aimbot`
     - `maxTicks`: Amount of ticks to check when the suspect gets a kill
     - `threshold`: Maximum threshold between angles before adding an infraction for aimbotting

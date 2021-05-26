@@ -66,10 +66,11 @@ const detectors = fs.readdirSync(path.join(__dirname, "..", "detectors")).filter
 });
 
 module.exports = class Demo {
-	constructor(buffer, suspect64Id, config) {
+	constructor(buffer, suspect64Id, config, owBody) {
 		this.buffer = buffer;
 		this.suspect64Id = suspect64Id;
 		this.config = config;
+		this.owBody = owBody;
 
 		this.suspectPlayer = undefined;
 		this.obj = {
@@ -83,8 +84,23 @@ module.exports = class Demo {
 		};
 		this.detectors = [];
 		this.players = {};
+		this.timings = {
+			freezeTime: 0, // Should count half time & match end too but lets just pretend those are map-loading times and should be added
+			suspectDead: 0,
+			totalTicksForWatching: 0
+		};
+		this.tickrateCalculation = {
+			startTime: -1,
+			endTime: -1,
+			snapshotsPassed: 0
+		};
 
 		this.demo = new demofile.DemoFile();
+	}
+
+	get snapshotrate() {
+		// Not 100% perfect but good enough
+		return this.tickrateCalculation.snapshotsPassed;
 	}
 
 	logResults() {
@@ -179,6 +195,45 @@ module.exports = class Demo {
 				this.obj.tickRate = this.demo.tickRate;
 				this.obj.tickInterval = this.demo.tickInterval;
 				this.obj.map = this.demo.header.mapName;
+			});
+
+			this.demo.on("tickstart", (tick) => {
+				// "this.demo.tickRate" returns server tickrate NOT the demo tickrate which is configurable via "tv_snapshotrate"
+				// We don't have access to this convar so just try to calculate it manually
+
+				if (this.demo.currentTime <= 0) {
+					return;
+				}
+
+				if (this.tickrateCalculation.startTime === -1) {
+					this.tickrateCalculation.startTime = this.demo.currentTime;
+				}
+
+				if (this.tickrateCalculation.endTime === -1) {
+					this.tickrateCalculation.snapshotsPassed++; // Not a tick, 32 tick demos skip every other tick for example
+
+					if (this.demo.currentTime >= (this.tickrateCalculation.startTime + 1)) {
+						this.tickrateCalculation.endTime = this.demo.currentTime;
+					}
+				}
+			});
+
+			this.demo.on("tickend", (tick) => {
+				if (!this.demo.entities.entities.find(e => e && e.serverClass.name === "CCSGameRulesProxy")) {
+					return;
+				}
+
+				if (this.demo.gameRules.roundsPlayed >= this.owBody.fractionid && this.demo.gameRules.roundsPlayed <= ((this.owBody.fractionid + this.owBody.fractionrounds))) {
+					this.timings.totalTicksForWatching++;
+
+					if (this.demo.gameRules.props.DT_CSGameRules.m_bFreezePeriod) {
+						this.timings.freezeTime++;
+					}
+
+					if (!this.suspectPlayer || !this.suspectPlayer.isAlive) {
+						this.timings.suspectDead++;
+					}
+				}
 			});
 
 			this.demo.on("net_SetConVar", (ev) => {

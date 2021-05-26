@@ -77,8 +77,8 @@ module.exports = class Coordinator extends Events {
 				return;
 			}
 
-			this.steamUser.sendToGC(appid, msg, proto, buffer);
 			if (!responseHeader) {
+				this.steamUser.sendToGC(appid, msg, proto, buffer);
 				resolve();
 				return;
 			}
@@ -97,6 +97,9 @@ module.exports = class Coordinator extends Events {
 					resolve(ByteBuffer.isByteBuffer(payload) ? payload.toBuffer() : payload);
 				}
 			}
+
+			// We must run this AFTER the listeners were added
+			this.steamUser.sendToGC(appid, msg, proto, buffer);
 		});
 	}
 };
