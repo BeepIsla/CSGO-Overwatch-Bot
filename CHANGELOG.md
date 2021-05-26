@@ -1,3 +1,12 @@
+# 2.6.5
+
+- Updated dependencies
+  - Fixes security vulnerability ([#203](https://github.com/BeepIsla/CSGO-Overwatch-Bot/pull/203))
+- Updated protobufs
+- Added new config variable `waitCalculatedDemoTime`
+  - If set to `true` will calculate the rough amount of time the demo would usually take you to watch legitimately without any manual skipping
+- Fixed Steamworks not automatically installing when no `data` folder exists ([#204](https://github.com/BeepIsla/CSGO-Overwatch-Bot/issues/204))
+
 # 2.6.4
 
 - Updated libraries

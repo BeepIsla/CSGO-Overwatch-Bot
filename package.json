@@ -1,6 +1,6 @@
 {
   "name": "csgo-overwatch-bot",
-  "version": "2.6.4",
+  "version": "2.6.5",
   "description": "Automatically solves Overwatch cases. Its not good but its trying.",
   "repository": {
     "type": "git",
