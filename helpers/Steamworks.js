@@ -44,9 +44,10 @@ module.exports = class Steamworks extends Events.EventEmitter {
 
 		// Temporarily change working directory for loading DLLs
 		let oldDir = process.cwd();
-		process.chdir(path.join(__dirname, "..", "data", Helper.GetOSDir()));
 
 		try {
+			process.chdir(path.join(__dirname, "..", "data", Helper.GetOSDir()));
+
 			Steam = require("steam");
 		} catch {
 			console.log("Failed to find Steamworks module - Attempting to automatically install...");
@@ -74,6 +75,7 @@ module.exports = class Steamworks extends Events.EventEmitter {
 				Steam = require("steam");
 			} catch {
 				this.emit("error", new Error("Failed to automatically install required addon. Please run \"npm i ./extension/steam\"."));
+				return;
 			}
 		}
 
