@@ -219,7 +219,7 @@ module.exports = class Demo {
 			});
 
 			this.demo.on("tickend", (tick) => {
-				if (!this.demo.entities.entities.find(e => e && e.serverClass.name === "CCSGameRulesProxy")) {
+				if (!this.owBody || !this.demo.entities.entities.find(e => e && e.serverClass.name === "CCSGameRulesProxy")) {
 					return;
 				}
 
