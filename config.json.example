@@ -13,7 +13,7 @@
 		"waitCalculatedDemoTime": true,
 		"aimbot": {
 			"maxTicks": 10,
-			"threshold": 1.0
+			"threshold": 5.0
 		},
 		"afking": {
 			"radius": 50
