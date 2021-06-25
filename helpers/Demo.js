@@ -100,7 +100,7 @@ module.exports = class Demo {
 
 	get snapshotrate() {
 		// Not 100% perfect but good enough
-		return this.tickrateCalculation.snapshotsPassed;
+		return this.tickrateCalculation.endTime === -1 ? 0 : this.tickrateCalculation.snapshotsPassed;
 	}
 
 	logResults() {
@@ -201,15 +201,13 @@ module.exports = class Demo {
 				// "this.demo.tickRate" returns server tickrate NOT the demo tickrate which is configurable via "tv_snapshotrate"
 				// We don't have access to this convar so just try to calculate it manually
 
-				if (this.demo.currentTime <= 0) {
+				if (this.demo.currentTime <= 3) {
 					return;
 				}
 
 				if (this.tickrateCalculation.startTime === -1) {
 					this.tickrateCalculation.startTime = this.demo.currentTime;
-				}
-
-				if (this.tickrateCalculation.endTime === -1) {
+				} else if (this.tickrateCalculation.endTime === -1) {
 					this.tickrateCalculation.snapshotsPassed++; // Not a tick, 32 tick demos skip every other tick for example
 
 					if (this.demo.currentTime >= (this.tickrateCalculation.startTime + 1)) {

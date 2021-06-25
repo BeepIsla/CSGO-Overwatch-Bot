@@ -17,6 +17,9 @@
 		},
 		"afking": {
 			"radius": 50
+		},
+		"bhop": {
+			"tickDiff": 1
 		}
 	},
 	"detectors": {
@@ -24,7 +27,8 @@
 		"Wallhack": true,
 		"Griefing": true,
 		"AFKing": true,
-		"AntiAim": true
+		"AntiAim": true,
+		"Bhop": true
 	},
 	"verdict": {
 		"writeLog": true,
@@ -38,6 +42,7 @@
 		"minAFKing": 5,
 		"minAntiAim": 20,
 		"minTeamKills": 2,
-		"minTeamDamage": 150
+		"minTeamDamage": 150,
+		"minBhop": 15
 	}
 }
