@@ -12,6 +12,7 @@ const NormalizeAsYaw = function (flAngle) {
 		return flAngle;
 	}
 var old_m_vecOrigin = { x: 0, y: 0, z: 0 }
+var old_round = -1
 
 // This class name MUST be unique or it will override other results
 module.exports = class AntiAim {
@@ -85,18 +86,29 @@ module.exports = class AntiAim {
 		const m_flLowerBodyYawTarget = this.parent.suspectPlayer.getProp("DT_CSPlayer", "m_flLowerBodyYawTarget");
 		const m_vecOrigin = this.parent.suspectPlayer.getProp("DT_CSNonLocalPlayerExclusive", "m_vecOrigin");
 		const eyeAngles = this.parent.suspectPlayer.eyeAngles;
-		const lbyDelta = m_flLowerBodyYawTarget - eyeAngles.yaw;
+		const yaw = NormalizeAsYaw(this.parent.suspectPlayer.eyeAngles.yaw);
+		const lbyDelta = m_flLowerBodyYawTarget - yaw;
+		const delta1= lbyDelta >= 20 && lbyDelta <= 60;
+		const delta2 = lbyDelta >= 250 && lbyDelta <= 300;
+		const round = this.parent.demo.gameRules.props.DT_CSGameRules.m_totalRoundsPlayed
 		var is_moving = true
+		
 		if (JSON.stringify(m_vecOrigin) === JSON.stringify(old_m_vecOrigin)){
 			is_moving = false //if he is moving the detector will detect many false positives
 		}
-		old_m_vecOrigin = this.parent.suspectPlayer.getProp("DT_CSNonLocalPlayerExclusive", "m_vecOrigin");
-		if (lbyDelta <= 40 || currentWeaponIsGrenade() || eyeAngles.pitch !== 0 ||  !is_moving || eyeAngles.yaw !== 0) {
-			// ? if I didn't check yaw I get false positive sometimes. 
-			// ? but in rage cheater what really have AA detects didn't increase or decrease
-			// All good
+		
+		if (!delta1 === !delta2){
 			return;
 		}
+		
+		old_m_vecOrigin = this.parent.suspectPlayer.getProp("DT_CSNonLocalPlayerExclusive", "m_vecOrigin");
+		
+		if ( currentWeaponIsGrenade() ||  !is_moving ||  yaw > 40 || round != old_round) {
+			old_round = this.parent.demo.gameRules.props.DT_CSGameRules.m_totalRoundsPlayed //sometimes at round start there is one false posive
+			return;
+		}
+		
+		old_round = this.parent.demo.gameRules.props.DT_CSGameRules.m_totalRoundsPlayed
 
 		this.infractions.push({
 			tick: this.parent.demo.currentTick,
