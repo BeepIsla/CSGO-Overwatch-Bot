@@ -1,3 +1,17 @@
+const NormalizeAsYaw = function (flAngle) {
+		if (flAngle > 180 || flAngle < -180)
+		{
+			var revolutions = Math.round(Math.abs(flAngle / 360));
+	
+			if (flAngle < 0)
+				flAngle += 360 * revolutions;
+			else
+				flAngle -= 360 * revolutions;
+		}
+	
+		return flAngle;
+	}
+
 // This class name MUST be unique or it will override other results
 module.exports = class AntiAim {
 	constructor(parent, config) {
@@ -42,10 +56,13 @@ module.exports = class AntiAim {
 	 * Custom Methods *
 	 ******************/
 	OnTickEnd(tick) {
-		if (!this.parent.suspectPlayer || !this.parent.suspectPlayer.isAlive) {
-			// Suspect left or is dead
+		if (!this.parent.suspectPlayer
+			|| !this.parent.suspectPlayer.isAlive
+			|| this.parent.demo.gameRules.isWarmup
+			|| this.parent.demo.gameRules.props.DT_CSGameRules.m_bFreezePeriod)
+			// Suspect left or is dead or in freezeperiod
 			return;
-		}
+		
 
 		// Check if player look at floor and check angles
 		// ! Be aware. This detector is unstable. 
