@@ -64,6 +64,18 @@ module.exports = class AntiAim {
 			return;
 		
 
+		const weapon = this.parent.suspectPlayer.weapon ? this.parent.suspectPlayer.weapon.className : null;
+		const currentWeaponIsGrenade = () => {
+			const weapons = [
+				"weapon_hegrenade",
+				"weapon_flashbang",
+				"weapon_smokegrenade",
+				"weapon_decoy",
+				"weapon_incgrenade",
+				"weapon_molotov",
+			];
+			return weapons.includes(weapon);
+		};
 		// Check if player look at floor and check angles
 		// ! Be aware. This detector is unstable. 
 		// ! I don't sure by 100%, but if player just look at floor (0deg) and didn't kill anybody
@@ -72,7 +84,7 @@ module.exports = class AntiAim {
 		const m_flLowerBodyYawTarget = this.parent.suspectPlayer.getProp("DT_CSPlayer", "m_flLowerBodyYawTarget");
 		const eyeAngles = this.parent.suspectPlayer.eyeAngles;
 		const lbyDelta = m_flLowerBodyYawTarget - eyeAngles.yaw;
-		if (lbyDelta <= 40 || eyeAngles.pitch !== 0 || eyeAngles.yaw !== 0) {
+		if (lbyDelta <= 40 || currentWeaponIsGrenade() || eyeAngles.pitch !== 0 || eyeAngles.yaw !== 0) {
 			// ? if I didn't check yaw I get false positive sometimes. 
 			// ? but in rage cheater what really have AA detects didn't increase or decrease
 			// All good
