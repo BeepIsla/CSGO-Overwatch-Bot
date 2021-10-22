@@ -40,7 +40,7 @@
 		"minAimbot": 15,
 		"minWallKills": 5,
 		"minAFKing": 5,
-		"minAntiAim": 20,
+		"minAntiAim": 1,
 		"minTeamKills": 2,
 		"minTeamDamage": 150,
 		"minBhop": 15
