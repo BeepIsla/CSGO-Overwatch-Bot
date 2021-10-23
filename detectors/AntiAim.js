@@ -87,7 +87,7 @@ module.exports = class AntiAim {
 		const eyeAngles = this.parent.suspectPlayer.eyeAngles;
 		const yaw = NormalizeAsYaw(this.parent.suspectPlayer.eyeAngles.yaw);
 		const lbyDelta = m_flLowerBodyYawTarget - yaw;
-		const delta = lbyDelta >= 19 && lbyDelta <= 230;
+		const delta = lbyDelta >= 35 && lbyDelta <= 230;
 		const round = this.parent.demo.gameRules.props.DT_CSGameRules.m_totalRoundsPlayed
 		var is_moving = true
 		
