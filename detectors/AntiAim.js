@@ -87,8 +87,7 @@ module.exports = class AntiAim {
 		const eyeAngles = this.parent.suspectPlayer.eyeAngles;
 		const yaw = NormalizeAsYaw(this.parent.suspectPlayer.eyeAngles.yaw);
 		const lbyDelta = m_flLowerBodyYawTarget - yaw;
-		const delta1 = lbyDelta >= 20 && lbyDelta <= 60;
-		const delta2 = lbyDelta >= 250 && lbyDelta <= 300;
+		const delta = lbyDelta >= 19 && lbyDelta <= 230;
 		const round = this.parent.demo.gameRules.props.DT_CSGameRules.m_totalRoundsPlayed
 		var is_moving = true
 		
@@ -96,7 +95,7 @@ module.exports = class AntiAim {
 			is_moving = false
 		}
 		old_m_vecOrigin = this.parent.suspectPlayer.getProp("DT_CSNonLocalPlayerExclusive", "m_vecOrigin");
-		if (!delta1 === !delta2){
+		if (!delta){
 			return;
 		}
 		if (currentWeaponIsGrenade() || !is_moving || yaw > 40 || round != old_round) {
