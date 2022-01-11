@@ -595,7 +595,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		let lastVal = 0;
 		demo.demo.on("progress", (progressFraction) => {
 			let percentage = Math.round(progressFraction * 100);
-			if (lastVal === percentage || (percentage % 10) !== 0) {
+			if (lastVal === percentage || (percentage % 1) !== 0) {
 				return;
 			}
 			lastVal = percentage;
@@ -754,9 +754,25 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		}
 
 		// Wait this long before requesting a new case
-		let delay = body.throttleseconds || 10;
-		console.log("Waiting " + delay + " seconds before requesting a new case...");
-		await new Promise(p => setTimeout(p, delay * 1000));
+		
+		// Added waiting time between the Casses
+		delayCaseTime = config.parsing.delayTimeBetweenCase
+		let delaydiff = (delayCaseTime * 1000);
+		let delayrawsec = Math.ceil(delaydiff / 1000);
+
+		let delaysec = delayrawsec % 60;
+		let delaymin = Math.round((delayrawsec % 3600) / 60);
+		
+		if (delaymin > 0) {
+			if (delaysec < 10) {
+				delaysec = "0" + delaysec;
+			}
+			console.log("Waiting " + delaymin + ":" + delaysec + " minutes before requesting a new case...");
+		} else {
+			console.log("Waiting " + delaysec + " seconds before requesting a new case...");
+		}
+
+		await new Promise(p => setTimeout(p, delaydiff));
 
 		if (playStateBlocked) {
 			// We are blocked
