@@ -9,6 +9,7 @@
 	},
 	"parsing": {
 		"forceConvictOnPreviousBan": 3,
+		"delayTimeBetweenCase": 1253,
 		"minimumTime": 240,
 		"waitCalculatedDemoTime": true,
 		"aimbot": {
