@@ -1,10 +1,10 @@
 {
   "name": "csgo-overwatch-bot",
-  "version": "2.6.5",
+  "version": "2.6.6",
   "description": "Automatically solves Overwatch cases. Its not good but its trying.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BeepIsla/CSGO-Overwatch-Bot.git"
+    "url": "git+https://github.com/Spooonky/CSGO-Overwatch-Bot.git"
   },
   "main": "index.js",
   "scripts": {
