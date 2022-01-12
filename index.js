@@ -765,18 +765,29 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 
 		// Added waiting time between the Cases to huminize the bot
 		
-		minTime = config.verdict.minTimeBetweenCases;
-		maxTime = config.verdict.maxTimeBetweenCases;
+		let minTime = config.verdict.minTimeBetweenCases;
+		let maxTime = config.verdict.maxTimeBetweenCases;
+
+		if (config.verdict.randomizePauseTime) {
 
 		function randomIntFromIntervall(min, max) {
-			return Math.floor(Math.random() * (max - min + 3) + min);
+			return Math.floor(Math.random() * (max - min + 3) + min); //randomize and add 3 Seconds.
 		}
 		const random = randomIntFromIntervall(minTime, maxTime);
-		let delaydiff = (random * 1000);
+		delaydiff = (random * 1000);
 		let delayrawsec = Math.ceil(delaydiff / 1000);
 
-		let delaysec = delayrawsec % 60;
-		let delaymin = Math.round((delayrawsec % 3600) / 60);
+		delaysec = delayrawsec % 60;
+		delaymin = Math.round((delayrawsec % 3600) / 60);
+		} else {
+			let delay = body.throttleseconds || 10;
+			delaydiff = delay * 1000;
+			let delaydiffrawsec = Math.ceil(delaydiff / 1000);
+
+			delaysec = delaydiffrawsec % 60;
+			delaymin = Math.round((delaydiffrawsec % 3600) / 60);
+			
+		}
 
 		if (delaymin > 0) {
 			if (delaysec < 10) {
