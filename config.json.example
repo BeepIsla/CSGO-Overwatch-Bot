@@ -7,9 +7,8 @@
 		"invisible": false,
 		"notifyXPReward": false
 	},
-	"parsing": {
+		"parsing": {
 		"forceConvictOnPreviousBan": 3,
-		"delayTimeBetweenCase": 1253,
 		"minimumTime": 240,
 		"waitCalculatedDemoTime": true,
 		"aimbot": {
@@ -33,11 +32,13 @@
 	},
 	"verdict": {
 		"writeLog": true,
-		"backupDemo": true,
-		"printScoreboard": true,
-		"logWithEmojis": true,
-		"maxVerdicts": 0,
-
+		"backupDemo": false,
+		"printScoreboard": false,
+		"logWithEmojis": false,
+		"minTimeBetweenCases": 1200,
+		"maxTimeBetweenCases": 1800,
+		"waitingTime": 1200, 
+		"maxVerdicts": 2,
 		"minAimbot": 15,
 		"minWallKills": 5,
 		"minAFKing": 5,
