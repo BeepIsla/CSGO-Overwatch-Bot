@@ -1,3 +1,19 @@
+var old_m_vecOrigin = { x: 0, y: 0, z: 0 }
+var old_round = -1
+const NormalizeAsYaw = function (flAngle) {
+		if (flAngle > 180 || flAngle < -180)
+		{
+			var revolutions = Math.round(Math.abs(flAngle / 360));
+	
+			if (flAngle < 0)
+				flAngle += 360 * revolutions;
+			else
+				flAngle -= 360 * revolutions;
+		}
+	
+		return flAngle;
+	}
+
 // This class name MUST be unique or it will override other results
 module.exports = class AntiAim {
 	constructor(parent, config) {
@@ -42,25 +58,55 @@ module.exports = class AntiAim {
 	 * Custom Methods *
 	 ******************/
 	OnTickEnd(tick) {
-		if (!this.parent.suspectPlayer || !this.parent.suspectPlayer.isAlive) {
-			// Suspect left or is dead
-			return;
-		}
+		if (!this.parent.suspectPlayer
+			|| !this.parent.suspectPlayer.isAlive
+			|| this.parent.demo.gameRules.isWarmup
+			|| this.parent.demo.gameRules.props.DT_CSGameRules.m_bFreezePeriod)
+			return; 
+		
 
+		const weapon = this.parent.suspectPlayer.weapon ? this.parent.suspectPlayer.weapon.className : null;
+		const currentWeaponIsGrenade = () => {
+			const weapons = [
+				"weapon_hegrenade",
+				"weapon_flashbang",
+				"weapon_smokegrenade",
+				"weapon_decoy",
+				"weapon_incgrenade",
+				"weapon_molotov",
+			];
+			return weapons.includes(weapon);
+		};
 		// Check if player look at floor and check angles
 		// ! Be aware. This detector is unstable. 
 		// ! I don't sure by 100%, but if player just look at floor (0deg) and didn't kill anybody
 		// ! this detector can say what he have AntiAim (AA)... need more tests!
 		// ? Idea: https://www.unknowncheats.me/forum/counterstrike-global-offensive/208735-detecting-player-antiaim.html
 		const m_flLowerBodyYawTarget = this.parent.suspectPlayer.getProp("DT_CSPlayer", "m_flLowerBodyYawTarget");
+		const m_vecOrigin = this.parent.suspectPlayer.getProp("DT_CSNonLocalPlayerExclusive", "m_vecOrigin");
 		const eyeAngles = this.parent.suspectPlayer.eyeAngles;
-		const lbyDelta = m_flLowerBodyYawTarget - eyeAngles.yaw;
-		if (lbyDelta <= 40 || eyeAngles.pitch !== 0 || eyeAngles.yaw !== 0) {
-			// ? if I didn't check yaw I get false positive sometimes. 
-			// ? but in rage cheater what really have AA detects didn't increase or decrease
-			// All good
+		const yaw = NormalizeAsYaw(this.parent.suspectPlayer.eyeAngles.yaw);
+		const lbyDelta = m_flLowerBodyYawTarget - yaw;
+		const delta = lbyDelta >= 20 && lbyDelta <= 230;
+		const sequence = this.parent.suspectPlayer.props.DT_Animationlayer.m_nSequence;
+		const wrong_seq = sequence === 126 
+		const round = this.parent.demo.gameRules.props.DT_CSGameRules.m_totalRoundsPlayed
+		var is_moving = true
+		
+		if (JSON.stringify(m_vecOrigin) === JSON.stringify(old_m_vecOrigin)){
+			is_moving = false
+		}
+		old_m_vecOrigin = this.parent.suspectPlayer.getProp("DT_CSNonLocalPlayerExclusive", "m_vecOrigin");
+		if (!delta){
 			return;
 		}
+		if (currentWeaponIsGrenade() || wrong_seq || !is_moving || yaw > 40 || round != old_round) {
+			old_round = this.parent.demo.gameRules.props.DT_CSGameRules.m_totalRoundsPlayed
+			return;
+		}
+
+		
+		old_round = this.parent.demo.gameRules.props.DT_CSGameRules.m_totalRoundsPlayed
 
 		this.infractions.push({
 			tick: this.parent.demo.currentTick,
