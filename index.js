@@ -664,6 +664,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 
 		console.log("Cases completed this session: " + ++casesCompleted);
 
+
 		// Log timings
 		let longestKey = Math.max(Object.keys(timings).map(k => k.length));
 		let longestTiming = Math.max(Object.keys(timings).map(k => timings[k].toString().length));
@@ -748,21 +749,29 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 
 		if (config.verdict.maxVerdicts > 0 && casesCompleted >= config.verdict.maxVerdicts) {
 			console.log("Finished doing " + config.verdict.maxVerdicts + " verdict" + (config.verdict.maxVerdicts === 1 ? "" : "s"));
-			steam.logOff();
-			process.exitCode = 0; // Success exit code - PM2 or whatever the user uses should not restart the process
+			//custom code to huminize the bot
+			console.log("Waiting 2 hours before attemp a new Overwatch case.");
+			timeBetween = config.verdict.waitingTime
+			await new Promise(p => setTimeout(p, (timeBetween * 1000))); // Wait 2 hours before requesting a new case. Cases defined in config.json through maxVerdicts
+			casesCompleted = 0;
 			return;
 		}
 
-		// Wait this long before requesting a new case
+		// Added waiting time between the Cases to huminize the bot
 		
-		// Added waiting time between the Casses
-		delayCaseTime = config.parsing.delayTimeBetweenCase
-		let delaydiff = (delayCaseTime * 1000);
+		minTime = config.verdict.minTimeBetweenCases;
+		maxTime = config.verdict.maxTimeBetweenCases;
+
+		function randomIntFromIntervall(min, max) {
+			return Math.floor(Math.random() * (max - min + 3) + min);
+		}
+		const random = randomIntFromIntervall(minTime, maxTime);
+		let delaydiff = (random * 1000);
 		let delayrawsec = Math.ceil(delaydiff / 1000);
 
 		let delaysec = delayrawsec % 60;
 		let delaymin = Math.round((delayrawsec % 3600) / 60);
-		
+
 		if (delaymin > 0) {
 			if (delaysec < 10) {
 				delaysec = "0" + delaysec;
