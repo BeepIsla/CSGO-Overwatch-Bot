@@ -764,14 +764,16 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		}
 
 		// Added waiting time between the Cases to huminize the bot
+		//CUSTOM Start
+		///////////////////
 		
-		let minTime = config.verdict.minTimeBetweenCases;
+		let minTime = config.verdict.minTimeBetweenCases; //pick time from Config.json
 		let maxTime = config.verdict.maxTimeBetweenCases;
 
 		if (config.verdict.randomizePauseTime) {
 
 		function randomIntFromIntervall(min, max) {
-			return Math.floor(Math.random() * (max - min + 3) + min); //randomize and add 3 Seconds.
+			return Math.floor(Math.random() * (max - min + 3) + min); //randomize fuction and add 3 Seconds.
 		}
 		const random = randomIntFromIntervall(minTime, maxTime);
 		delaydiff = (random * 1000);
@@ -804,7 +806,9 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 			// We are blocked
 			return;
 		}
-
+		/////////////
+		//Custom End
+		/////////////
 		console.log("Attempt to get Overwatch case...");
 		await coordinator.sendMessage(
 			730,
