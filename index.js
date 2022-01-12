@@ -749,7 +749,13 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 
 		if (config.verdict.maxVerdicts > 0 && casesCompleted >= config.verdict.maxVerdicts) {
 			console.log("Finished doing " + config.verdict.maxVerdicts + " verdict" + (config.verdict.maxVerdicts === 1 ? "" : "s"));
-			//custom code to huminize the bot
+			steam.logOff();
+			process.exitCode = 0; // Success exit code - PM2 or whatever the user uses should not restart the process
+			return;
+		}
+
+		if (config.verdict.timeAfterVerdicts > 0 && casesCompleted >= config.verdict.verdictNumber) {
+			console.log("Finished doing " + config.verdict.verdictNumber + "verdict" + (config.verdict.verdictNumber === 1 ? "" : "s"));
 			console.log("Waiting 2 hours before attemp a new Overwatch case.");
 			timeBetween = config.verdict.waitingTime
 			await new Promise(p => setTimeout(p, (timeBetween * 1000))); // Wait 2 hours before requesting a new case. Cases defined in config.json through maxVerdicts
