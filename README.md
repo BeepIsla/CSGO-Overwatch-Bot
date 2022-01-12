@@ -53,6 +53,10 @@ NodeJS 12+ version
   - `backupDemo`: Should we backup the Overwatch demo in a folder called `cases/<CaseID>`?
   - `printScoreboard`: Should we print a scoreboard with player statistics to console?
   - `logWithEmojis`: Should we print with emojis? Set to `false` to use "YES"/"NO" instead of "✔️"/"❌"
+  - `minTimeBetweenCases`: Min time the bot should wait before requesting a new case. The bot will randomize between min and max.
+  - `maxTimeBetweenCases`: Max time the bot should wait before requesting a new case. The bot will randomize between min and max.
+  - `verdictNumber`: Number of cases to do before bot will wait `waitingTime`.
+  - `waitingTime`: Time to wait after `verdictNumber` reached.
   - `maxVerdicts`: Maximum amount of Overwatch cases to do before stopping. `0` for unlimited.
   - `minAimbot`: Minimum amount of aimbot infractions required to convict for aimbotting
   - `minWallKills`: Minimum amount of kills through a wall required to convict for wallhacking
