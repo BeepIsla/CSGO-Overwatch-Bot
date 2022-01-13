@@ -595,7 +595,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		let lastVal = 0;
 		demo.demo.on("progress", (progressFraction) => {
 			let percentage = Math.round(progressFraction * 100);
-			if (lastVal === percentage || (percentage % 10) !== 0) {
+			if (lastVal === percentage || (percentage % 1) !== 0) {
 				return;
 			}
 			lastVal = percentage;
@@ -663,6 +663,7 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 		demo.logResults();
 
 		console.log("Cases completed this session: " + ++casesCompleted);
+
 
 		// Log timings
 		let longestKey = Math.max(Object.keys(timings).map(k => k.length));
@@ -753,16 +754,61 @@ coordinator.on("receivedFromGC", async (msgType, payload) => {
 			return;
 		}
 
-		// Wait this long before requesting a new case
-		let delay = body.throttleseconds || 10;
-		console.log("Waiting " + delay + " seconds before requesting a new case...");
-		await new Promise(p => setTimeout(p, delay * 1000));
+		if (config.verdict.timeAfterVerdicts > 0 && casesCompleted >= config.verdict.verdictNumber) {
+			console.log("Finished doing " + config.verdict.verdictNumber + "verdict" + (config.verdict.verdictNumber === 1 ? "" : "s"));
+			console.log("Waiting 2 hours before attemp a new Overwatch case.");
+			timeBetween = config.verdict.waitingTime
+			await new Promise(p => setTimeout(p, (timeBetween * 1000))); // Wait 2 hours before requesting a new case. Cases defined in config.json through maxVerdicts
+			casesCompleted = 0;
+			return;
+		}
+
+		// Added waiting time between the Cases to huminize the bot
+		//CUSTOM Start
+		///////////////////
+		
+		let minTime = config.verdict.minTimeBetweenCases; //pick time from Config.json
+		let maxTime = config.verdict.maxTimeBetweenCases;
+
+		if (config.verdict.randomizePauseTime) {
+
+		function randomIntFromIntervall(min, max) {
+			return Math.floor(Math.random() * (max - min + 3) + min); //randomize fuction and add 3 Seconds.
+		}
+		const random = randomIntFromIntervall(minTime, maxTime);
+		delaydiff = (random * 1000);
+		let delayrawsec = Math.ceil(delaydiff / 1000);
+
+		delaysec = delayrawsec % 60;
+		delaymin = Math.round((delayrawsec % 3600) / 60);
+		} else {
+			let delay = body.throttleseconds || 10;
+			delaydiff = delay * 1000;
+			let delaydiffrawsec = Math.ceil(delaydiff / 1000);
+
+			delaysec = delaydiffrawsec % 60;
+			delaymin = Math.round((delaydiffrawsec % 3600) / 60);
+			
+		}
+
+		if (delaymin > 0) {
+			if (delaysec < 10) {
+				delaysec = "0" + delaysec;
+			}
+			console.log("Waiting " + delaymin + ":" + delaysec + " minutes before requesting a new case...");
+		} else {
+			console.log("Waiting " + delaysec + " seconds before requesting a new case...");
+		}
+
+		await new Promise(p => setTimeout(p, delaydiff));
 
 		if (playStateBlocked) {
 			// We are blocked
 			return;
 		}
-
+		/////////////
+		//Custom End
+		/////////////
 		console.log("Attempt to get Overwatch case...");
 		await coordinator.sendMessage(
 			730,

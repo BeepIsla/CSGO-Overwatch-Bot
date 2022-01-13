@@ -4,6 +4,8 @@ Automatically solves Overwatch cases. Its not good but its trying.
 
 You can forcefully parse a demo by running `node force.js`, it will ask you for a demo file path and a suspect SteamID. Alternatively just use `node force.js <Demo> <SteamID>`
 
+I added some new useful feature take a look at [Config](#config)
+
 ## VAC & Other Bans
 
 This script **does not** even initialize VAC, you cannot be VAC banned for a cheat detection using this. You **can** however get manually banned or even suspended from Steam entirely for using this. Valve does **not** want you to automate Overwatch cases. Use this at your own risk. I am not responsible for any bans, damages, lost items or anything else. You have been warned.
@@ -53,6 +55,10 @@ NodeJS 12+ version
   - `backupDemo`: Should we backup the Overwatch demo in a folder called `cases/<CaseID>`?
   - `printScoreboard`: Should we print a scoreboard with player statistics to console?
   - `logWithEmojis`: Should we print with emojis? Set to `false` to use "YES"/"NO" instead of "✔️"/"❌"
+  - `minTimeBetweenCases`: Min time the bot should wait before requesting a new case. The bot will randomize between min and max.
+  - `maxTimeBetweenCases`: Max time the bot should wait before requesting a new case. The bot will randomize between min and max.
+  - `verdictNumber`: Number of cases to do before bot will wait `waitingTime`.
+  - `waitingTime`: Time to wait after `verdictNumber` reached.
   - `maxVerdicts`: Maximum amount of Overwatch cases to do before stopping. `0` for unlimited.
   - `minAimbot`: Minimum amount of aimbot infractions required to convict for aimbotting
   - `minWallKills`: Minimum amount of kills through a wall required to convict for wallhacking
