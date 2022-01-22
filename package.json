@@ -21,7 +21,7 @@
     "colors": "^1.4.0",
     "demofile": "^1.8.0",
     "inquirer": "^7.3.3",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "protobufjs": "^6.10.1",
     "serialize-error": "^7.0.1",
     "steam-totp": "^2.1.1",
